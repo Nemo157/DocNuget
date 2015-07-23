@@ -1,0 +1,20 @@
+@model DocNuget.Models.Assembly
+@{ ViewBag.Title = Model.Name; }
+
+<div class="page-header">
+    <h1>@Model.Name <small><code>@Model.Framework</code></small></h1>
+</div>
+
+<h2>Classes</h2>
+<ul style="list-style: none">
+  <li>@await Html.PartialAsync("_Namespace", Model.RootNamespace)</li>
+</ul>
+
+<h2>Frameworks</h2>
+<ul>
+  @foreach (var framework in Model.Frameworks) {
+    <li>
+      @Html.ActionLink(framework, "Show", "Assembly", new { package = Model.Package.Id, version = Model.Package.Version, assembly = Model.Name, framework })
+    </li>
+  }
+</ul>

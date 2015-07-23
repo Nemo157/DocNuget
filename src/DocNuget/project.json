@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0-*",
+  "webroot": "wwwroot",
+  "exclude": [
+    "wwwroot"
+  ],
+  "dependencies": {
+    "Kestrel": "1.0.0-beta6-*",
+    "Microsoft.AspNet.Diagnostics": "1.0.0-beta6-*",
+    "Microsoft.AspNet.Mvc": "6.0.0-beta6-*",
+    "Microsoft.AspNet.Server.IIS": "1.0.0-beta6-*",
+    "Microsoft.AspNet.Server.WebListener": "1.0.0-beta6-*",
+    "Microsoft.AspNet.StaticFiles": "1.0.0-beta6-*",
+    "Microsoft.Framework.Logging.Console": "1.0.0-beta6-*",
+    "Microsoft.Framework.PackageManager": "1.0.0-beta6-*",
+    "DocNuget.Models": "1.0.0-*",
+    "Mono.Cecil": "0.9.6.1"
+  },
+  "commands": {
+    "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5001",
+    "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5004"
+  },
+  "frameworks": {
+    "dnx451": {}
+  }
+}
