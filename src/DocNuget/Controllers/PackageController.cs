@@ -16,12 +16,9 @@ using DocNuget.Models;
 
 namespace DocNuget.Controllers {
     public class PackageController : Controller {
-        [Route("packages/{package}/{version?}")]
-        public async Task<IActionResult> Show(string package, string version) {
-            return View(await Find(package, version == null ? null : new SemanticVersion(version)));
-        }
-
-        public async Task<Package> Find(string package, SemanticVersion version) {
+        [Route("api/packages/{package}.json")]
+        [Route("api/packages/{package}/{version}.json")]
+        public async Task<Models.Package> Show(string package, string version) {
             var loggerFactory = (ILoggerFactory)Resolver.GetService(typeof(ILoggerFactory));
             var logger = loggerFactory.CreateLogger<PackageController>();
 
@@ -61,7 +58,7 @@ namespace DocNuget.Controllers {
 
             var result = version == null
                 ? packages.FirstOrDefault()
-                : packages.FirstOrDefault(p => p.Version == version);
+                : packages.FirstOrDefault(p => p.Version == new SemanticVersion(version));
 
             if (result == null) {
                 logger.LogError("Unable to locate {0} v{1}", package, version);
@@ -78,9 +75,7 @@ namespace DocNuget.Controllers {
                 Version = zipPackage.Version.ToString(),
                 Versions = packages.Select(p => p.Version.ToString()).ToList(),
                 Summary = zipPackage.Summary ?? zipPackage.Description,
-            };
-
-            pa.Assemblies = zipPackage.GetFiles()
+                Assemblies = zipPackage.GetFiles()
                     .Select(file => file.Path.StartsWith("lib") && file.Path.EndsWith("dll")
                         ? new {
                             Name = Path.GetFileNameWithoutExtension(file.Path.Split('\\').Last()),
@@ -92,9 +87,9 @@ namespace DocNuget.Controllers {
                         Name = assemblies.Key,
                         Framework = assemblies.Select(assembly => assembly.Framework).FirstOrDefault(),
                         Frameworks = assemblies.Select(assembly => assembly.Framework).ToList(),
-                        Package = pa,
                     })
-                    .ToList();
+                    .ToList(),
+            };
 
             return pa;
         }

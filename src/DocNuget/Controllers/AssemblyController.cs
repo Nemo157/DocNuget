@@ -18,13 +18,11 @@ using DocNuget.Models;
 
 namespace DocNuget.Controllers {
     public class AssemblyController : Controller {
-        [Route("packages/{package}/{version}/assemblies/{assembly}/{framework?}")]
-        public async Task<IActionResult> Show(string package, string version, string assembly, string framework) {
-            var ass = await Find(package, version == null ? null : new SemanticVersion(version), assembly, framework);
-            return ass == null ? null : View(ass);
-        }
-
-        public async Task<Models.Assembly> Find(string package, SemanticVersion version, string assembly, string framework) {
+        [Route("api/packages/{package}/assemblies/{assembly}.json")]
+        [Route("api/packages/{package}/{version}/assemblies/{assembly}.json")]
+        [Route("api/packages/{package}/assemblies/{assembly}/{framework}.json")]
+        [Route("api/packages/{package}/{version}/assemblies/{assembly}/{framework}.json")]
+        public async Task<Models.Assembly> Show(string package, string version, string assembly, string framework) {
             var loggerFactory = (ILoggerFactory)Resolver.GetService(typeof(ILoggerFactory));
             var logger = loggerFactory.CreateLogger<PackageController>();
 
@@ -64,7 +62,7 @@ namespace DocNuget.Controllers {
 
             var result = version == null
                 ? packages.FirstOrDefault()
-                : packages.FirstOrDefault(p => p.Version == version);
+                : packages.FirstOrDefault(p => p.Version == new SemanticVersion(version));
 
             if (result == null) {
                 logger.LogError("Unable to locate {0} v{1}", package, version);
@@ -99,14 +97,6 @@ namespace DocNuget.Controllers {
                 return null;
             }
 
-            var pa = new Package {
-                Id = zipPackage.Id,
-                Title = zipPackage.Title ?? zipPackage.Id,
-                Version = zipPackage.Version?.ToString(),
-                Versions = packages.Select(p => p.Version?.ToString()).ToList(),
-                Summary = zipPackage.Summary ?? zipPackage.Description,
-            };
-
             var ass = new Models.Assembly {
                 Name = assembly,
                 Framework = framework,
@@ -115,29 +105,27 @@ namespace DocNuget.Controllers {
                     .Where(f => f != null)
                     .Select(f => f.ToString())
                     .ToList(),
-                Package = pa,
+                RootNamespace = new Models.Namespace {
+                    Name = "<root>",
+                    FullName = "",
+                    Namespaces = new List<Models.Namespace>(),
+                    Types = new List<Models.Type>(),
+                },
             };
 
-            ass.RootNamespace = new Models.Namespace {
-                Name = "<root>",
-                FullName = "",
-                Assembly = ass,
-                Namespaces = new List<Models.Namespace>(),
-                Types = new List<Models.Type>(),
-            };
+            var types = reflectedAssembly.Modules.SelectMany(module => module.Types).Where(type => type.IsPublic);
 
-            foreach (var @namespace in reflectedAssembly.Modules.SelectMany(module => module.Types.Select(type => type.Namespace)).Distinct()) {
+            foreach (var @namespace in types.Select(type => type.Namespace).Distinct()) {
                 if (@namespace == "") {
                     continue;
                 }
                 Insert(ass, ass.RootNamespace, @namespace.Split('.'));
             }
 
-            foreach (var group in reflectedAssembly.Modules.SelectMany(module => module.Types).GroupBy(type => type.Namespace)) {
+            foreach (var group in types.GroupBy(type => type.Namespace)) {
                 var @namespace = Walk(ass.RootNamespace, group.Key.Split('.').Where(val => val != ""));
                 @namespace.Types = group.Select(type => new Models.Type {
                     Name = type.Name,
-                    Namespace = @namespace,
                 }).ToList();
             }
 
@@ -154,7 +142,6 @@ namespace DocNuget.Controllers {
                 match = new Models.Namespace {
                     Name = path.First(),
                     FullName = (@namespace.FullName == "" ? "" : @namespace.FullName + ".") + path.First(),
-                    Assembly = assembly,
                     Namespaces = new List<Models.Namespace>(),
                     Types = new List<Models.Type>(),
                 };

@@ -1,5 +1,6 @@
 using System;
 using Microsoft.AspNet.Builder;
+using Microsoft.AspNet.StaticFiles;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 
@@ -13,7 +14,10 @@ namespace DocNuget {
             loggerFactory.MinimumLevel = LogLevel.Debug;
             loggerFactory.AddConsole(LogLevel.Debug);
             app.UseErrorPage();
-            app.UseStaticFiles();
+            app.UseDefaultFiles();
+            app.UseStaticFiles(new StaticFileOptions {
+                ServeUnknownFileTypes = true,
+            });
             app.UseMvc();
         }
     }

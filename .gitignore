@@ -3,4 +3,6 @@
 .nuget/
 packages/
 artifacts/
+node_modules/
+typings/
 project.lock.json

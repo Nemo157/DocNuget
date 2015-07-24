@@ -1,0 +1,22 @@
+{
+  "name": "DocNuget.Client.Web",
+  "version": "1.0.0",
+  "main": "app.ts",
+  "scripts": {
+    "build": "webpack"
+  },
+  "devDependencies": {
+    "raw-loader": "^0.5.1",
+    "ts-loader": "^0.4.7",
+    "tsd": "^0.6.3",
+    "typescript": "^1.5.3",
+    "webpack": "^1.10.5"
+  },
+  "dependencies": {
+    "emblem": "^0.6.1",
+    "handlebars": "^3.0.3",
+    "jquery": "^2.1.4",
+    "knottie-sammy": "^0.7.6",
+    "nprogress": "^0.2.0"
+  }
+}
