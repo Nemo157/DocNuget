@@ -18,10 +18,10 @@ using DocNuget.Models;
 
 namespace DocNuget.Controllers {
     public class AssemblyController : Controller {
-        [Route("api/packages/{package}/assemblies/{assembly}.json")]
-        [Route("api/packages/{package}/{version}/assemblies/{assembly}.json")]
-        [Route("api/packages/{package}/assemblies/{assembly}/{framework}.json")]
-        [Route("api/packages/{package}/{version}/assemblies/{assembly}/{framework}.json")]
+        [Route("api/packages/{package}/assemblies/{assembly}")]
+        [Route("api/packages/{package}/{version}/assemblies/{assembly}")]
+        [Route("api/packages/{package}/assemblies/{assembly}/{framework}")]
+        [Route("api/packages/{package}/{version}/assemblies/{assembly}/{framework}")]
         public async Task<Models.Assembly> Show(string package, string version, string assembly, string framework) {
             var loggerFactory = (ILoggerFactory)Resolver.GetService(typeof(ILoggerFactory));
             var logger = loggerFactory.CreateLogger<PackageController>();

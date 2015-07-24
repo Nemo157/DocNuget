@@ -11,10 +11,12 @@ var app = Sammy('#content', app => {
   app.get('/', route => route.partial('/views/index.em'))
   app.get('/about', route => route.partial('/views/about.em'))
   app.get('/packages/:package', route => route
-    .load('/api/packages/' + route.params.package + '.json')
+    .load('/api/packages/' + route.params.package)
+    .then(JSON.parse)
     .partial('/views/package.em'))
   app.get('/packages/:package/:version', route => route
-    .load('/api/packages/' + route.params.package + '/' + route.params.version + '.json')
+    .load('/api/packages/' + route.params.package + '/' + route.params.version)
+    .then(JSON.parse)
     .partial('/views/package.em'))
 })
 

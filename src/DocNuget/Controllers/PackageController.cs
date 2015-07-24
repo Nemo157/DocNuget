@@ -16,8 +16,8 @@ using DocNuget.Models;
 
 namespace DocNuget.Controllers {
     public class PackageController : Controller {
-        [Route("api/packages/{package}.json")]
-        [Route("api/packages/{package}/{version}.json")]
+        [Route("api/packages/{package}")]
+        [Route("api/packages/{package}/{version}")]
         public async Task<Models.Package> Show(string package, string version) {
             var loggerFactory = (ILoggerFactory)Resolver.GetService(typeof(ILoggerFactory));
             var logger = loggerFactory.CreateLogger<PackageController>();
