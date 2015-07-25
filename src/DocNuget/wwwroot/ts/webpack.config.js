@@ -8,6 +8,7 @@ module.exports = {
     alias: {
       'sammy': 'knottie-sammy',
       'sammy.push_location_proxy': 'knottie-sammy/lib/plugins/sammy.push_location_proxy',
+      'sammy.handlebars': 'knottie-sammy/lib/plugins/sammy.handlebars',
       'handlebars': 'handlebars/dist/handlebars'
     }
   },
