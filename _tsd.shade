@@ -1,6 +1,6 @@
 default currentDir = '${Directory.GetCurrentDirectory()}'
 default nodeDir = '${Path.Combine(currentDir, "bin", "nodejs")}'
-var tsdLibrary = '${ Path.Combine(nodeDir, "node_modules", "tsd") }'
+var tsdLibrary = '${ Path.Combine(nodeDir, "node_modules", "tsd", "build", "cli.js") }'
 var tsdInstalled = '${ Directory.Exists(tsdLibrary) }'
 
 default tsdGloballyInstalled = '${ !tsdInstalled && TestCommand("tsd", "--version") }'
