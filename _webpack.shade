@@ -1,0 +1,15 @@
+default currentDir = '${Directory.GetCurrentDirectory()}'
+default nodeDir = '${Path.Combine(currentDir, "bin", "nodejs")}'
+var webpackLibrary = '${ Path.Combine(nodeDir, "node_modules", ".bin", "webpack") }'
+var webpackInstalled = '${ File.Exists(webpackLibrary) }'
+
+default webpackGloballyInstalled = '${ !webpackInstalled && TestCommand("webpack", "--help") }'
+var webpackCmd = '${ webpackGloballyInstalled ? "webpack" : webpackLibrary }'
+
+- // Install webpack locally if not already installed either globally or locally; creates webpackLibrary file if run
+npm npmCommand='install ${E("npm_install_options")} --prefix "${nodeDir}" webpack' if='!(webpackGloballyInstalled || webpackInstalled)' once='installWebpack'
+
+-// Run webpack
+exec program='cmd' commandline='/C ${webpackCmd}' workingdir='${webpackDir}' if='webpackGloballyInstalled && !IsLinux'
+exec program='${webpackCmd}' workingdir='${webpackDir}' if='webpackGloballyInstalled && IsLinux'
+node nodeCommand='"${webpackCmd}"' workingdir='${webpackDir}' if='!webpackGloballyInstalled'
