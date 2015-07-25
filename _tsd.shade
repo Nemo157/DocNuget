@@ -10,6 +10,6 @@ var tsdCmd = '${ tsdGloballyInstalled ? "tsd" : tsdLibrary }'
 npm npmCommand='install ${E("npm_install_options")} --prefix "${nodeDir}" tsd' if='!(tsdGloballyInstalled || tsdInstalled)' once='installtsd'
 
 -// Run tsd
-exec program='cmd' commandline='/C "${tsdCmd} reinstall"' workingdir='${tsdDir}' if='tsdGloballyInstalled && !IsLinux'
-exec program='${tsdCmd}' commandline='reinstall' workingdir='${tsdDir}' if='tsdGloballyInstalled && IsLinux'
-node nodeCommand='"${tsdCmd}" reinstall' workingdir='${tsdDir}' if='!tsdGloballyInstalled'
+exec program='cmd' commandline='/C "${tsdCmd} reinstall --save"' workingdir='${tsdDir}' if='tsdGloballyInstalled && !IsLinux'
+exec program='${tsdCmd}' commandline='reinstall --save' workingdir='${tsdDir}' if='tsdGloballyInstalled && IsLinux'
+node nodeCommand='"${tsdCmd}" reinstall --save' workingdir='${tsdDir}' if='!tsdGloballyInstalled'
