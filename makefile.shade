@@ -4,4 +4,5 @@ var AUTHORS='Nemo157 (Wim Looman) <wim@nemo157.com>'
 
 use-standard-lifecycle
 webpack-goals
+tsd-goals
 k-standard-goals

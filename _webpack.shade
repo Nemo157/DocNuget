@@ -1,7 +1,7 @@
 default currentDir = '${Directory.GetCurrentDirectory()}'
 default nodeDir = '${Path.Combine(currentDir, "bin", "nodejs")}'
-var webpackLibrary = '${ Path.Combine(nodeDir, "node_modules", ".bin", "webpack") }'
-var webpackInstalled = '${ File.Exists(webpackLibrary) }'
+var webpackLibrary = '${ Path.Combine(nodeDir, "node_modules", "webpack") }'
+var webpackInstalled = '${ Directory.Exists(webpackLibrary) }'
 
 default webpackGloballyInstalled = '${ !webpackInstalled && TestCommand("webpack", "--help") }'
 var webpackCmd = '${ webpackGloballyInstalled ? "webpack" : webpackLibrary }'

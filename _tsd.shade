@@ -1,0 +1,15 @@
+default currentDir = '${Directory.GetCurrentDirectory()}'
+default nodeDir = '${Path.Combine(currentDir, "bin", "nodejs")}'
+var tsdLibrary = '${ Path.Combine(nodeDir, "node_modules", "tsd") }'
+var tsdInstalled = '${ Directory.Exists(tsdLibrary) }'
+
+default tsdGloballyInstalled = '${ !tsdInstalled && TestCommand("tsd", "--version") }'
+var tsdCmd = '${ tsdGloballyInstalled ? "tsd" : tsdLibrary }'
+
+- // Install tsd locally if not already installed either globally or locally; creates tsdLibrary file if run
+npm npmCommand='install ${E("npm_install_options")} --prefix "${nodeDir}" tsd' if='!(tsdGloballyInstalled || tsdInstalled)' once='installtsd'
+
+-// Run tsd
+exec program='cmd' commandline='/C "${tsdCmd} reinstall"' workingdir='${tsdDir}' if='tsdGloballyInstalled && !IsLinux'
+exec program='${tsdCmd}' commandline='reinstall' workingdir='${tsdDir}' if='tsdGloballyInstalled && IsLinux'
+node nodeCommand='"${tsdCmd}" reinstall' workingdir='${tsdDir}' if='!tsdGloballyInstalled'

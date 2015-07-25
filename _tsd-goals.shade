@@ -1,0 +1,4 @@
+#run-tsd .restore-npm-modules .restore-bower-components target='initialize'
+  -// Find all dirs that contain a tsd.json file
+  var tsdDirs = '${GetDirectoriesContaining(Directory.GetCurrentDirectory(), "tsd.json")}'
+  tsd each='var tsdDir in tsdDirs'
