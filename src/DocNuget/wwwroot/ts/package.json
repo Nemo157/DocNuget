@@ -14,7 +14,6 @@
   },
   "dependencies": {
     "handlebars": "^3.0.3",
-    "jquery": "^2.1.4",
     "knottie-sammy": "^0.7.6",
     "nprogress": "^0.2.0"
   }

@@ -8,9 +8,9 @@
 <ul>
   {{# each Assemblies as |Assembly| }}
     <li>
-      <samp><a href="/packages/{{ ../Id }}/{{ ../Version }}/{{ Assembly.Name }}">{{ Assembly.Name }}</a></samp>
+      <samp><a href="/packages/{{ ../Id }}/{{ ../Version }}/assemblies/{{ Assembly.Name }}">{{ Assembly.Name }}</a></samp>
       {{# each Frameworks as |Framework| }}
-        <small><code><a href="/packages/{{ ../../Id }}/{{ ../../Version }}/{{ Assembly.Name }}/{{ Framework }}">{{ Framework }}</a></code></small>
+        <small><code><a href="/packages/{{ ../../Id }}/{{ ../../Version }}/assemblies/{{ Assembly.Name }}/{{ Framework }}">{{ Framework }}</a></code></small>
       {{/ each }}
     </li>
   {{/ each }}

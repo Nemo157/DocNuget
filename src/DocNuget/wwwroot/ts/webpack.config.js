@@ -12,6 +12,10 @@ module.exports = {
       'handlebars': 'handlebars/dist/handlebars'
     }
   },
+  externals: {
+    'bootstrap': 'var $',
+    'jquery': 'var $'
+  },
   devtool: 'source-map',
   module: {
     loaders: [
