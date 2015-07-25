@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "module": "commonjs",
+    "sourceMap": true
+  },
+  "files": [
+    "tsd.d.ts",
+    "typings/tsd.d.ts"
+  ]
+}
