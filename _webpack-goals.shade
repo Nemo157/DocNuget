@@ -1,4 +1,4 @@
-#run-webpack .restore-npm-modules .restore-bower-components target='initialize'
+#run-webpack .restore-tsd-typings .restore-npm-modules .restore-bower-components target='initialize'
   -// Find all dirs that contain a webpack.config.js file
   var webPackDirs = '${GetDirectoriesContaining(Directory.GetCurrentDirectory(), "webpack.config.js")}'
   webpack each='var webpackDir in webPackDirs'
