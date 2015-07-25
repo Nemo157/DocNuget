@@ -5,6 +5,7 @@ import PushLocationProxy from './sammy/push_location_proxy'
 import Handlebars = require('handlebars')
 import SammyHandlebars = require('sammy.handlebars')
 import fade from './sammy/fade'
+import resolve from './resolve'
 
 var a = $
 var b = bootstrap
@@ -28,6 +29,7 @@ var app = Sammy('#content', app => {
       .loadPartials(map)
       .load('/api' + route.path)
       .then(JSON.parse)
+      .then(resolve)
       .partial('/views/' + partial + '.hb')
       .then(next)
   }

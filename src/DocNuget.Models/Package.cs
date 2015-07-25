@@ -20,6 +20,8 @@ namespace DocNuget.Models {
 
         public string Framework { get; set; }
 
+        public Package Package { get; set; }
+
         public List<string> Frameworks { get; set; }
 
         public Namespace RootNamespace { get; set; }
@@ -30,6 +32,8 @@ namespace DocNuget.Models {
 
         public string FullName { get; set; }
 
+        public Assembly Assembly { get; set; }
+
         public List<Namespace> Namespaces { get; set; }
 
         public List<Type> Types { get; set; }
@@ -37,5 +41,7 @@ namespace DocNuget.Models {
 
     public class Type {
         public string Name { get; set; }
+
+        public Namespace Namespace { get; set; }
     }
 }
