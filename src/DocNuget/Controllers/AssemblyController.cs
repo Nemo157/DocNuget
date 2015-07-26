@@ -1,11 +1,9 @@
-using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.Runtime;
 using Microsoft.Framework.Logging;
 
-using DocNuget.Models;
 using DocNuget.Models.Loader;
 
 namespace DocNuget.Controllers {
@@ -14,9 +12,13 @@ namespace DocNuget.Controllers {
         [Route("api/packages/{package}/{version}/assemblies/{assembly}")]
         [Route("api/packages/{package}/assemblies/{assembly}/{framework}")]
         [Route("api/packages/{package}/{version}/assemblies/{assembly}/{framework}")]
-        public Task<Models.Assembly> Show(string package, string version, string assembly, string framework) {
+        public async Task<Models.Assembly> Show(string package, string version, string assembly, string framework) {
             var loggerFactory = (ILoggerFactory)Resolver.GetService(typeof(ILoggerFactory));
-            return new AssemblyLoader(loggerFactory).Load(package, version, assembly, framework);
+            return (await new PackageLoader(loggerFactory).Load(package, version))
+                .Assemblies
+                .Where(a => a.Name == assembly)
+                .Where(a => framework == null || a.TargetFramework.FullName == framework)
+                .FirstOrDefault();
         }
     }
 }

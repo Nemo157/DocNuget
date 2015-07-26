@@ -1,17 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.Framework.PackageManager;
-using Microsoft.Framework.Runtime;
 using Microsoft.Framework.Logging;
 
-using Newtonsoft.Json;
 using NuGet;
-
-using DocNuget.Models;
 
 namespace DocNuget.Models.Loader {
     public class PackageLoader {
@@ -21,7 +14,7 @@ namespace DocNuget.Models.Loader {
             _loggerFactory = loggerFactory;
         }
 
-        public async Task<Models.Package> Load(string package, string version) {
+        public async Task<Package> Load(string package, string version) {
             var logger = _loggerFactory.CreateLogger<PackageLoader>();
 
             var sourceProvider = new PackageSourceProvider(
@@ -35,24 +28,7 @@ namespace DocNuget.Models.Loader {
                         source,
                         noCache: false,
                         ignoreFailedSources: false,
-                        reports: new Reports {
-                            Information = new LoggerReport {
-                                LogLevel = LogLevel.Information,
-                                Logger = logger,
-                            },
-                            Verbose = new LoggerReport {
-                                LogLevel = LogLevel.Verbose,
-                                Logger = logger,
-                            },
-                            Quiet = new LoggerReport {
-                                LogLevel = LogLevel.Debug,
-                                Logger = logger,
-                            },
-                            Error = new LoggerReport {
-                                LogLevel = LogLevel.Error,
-                                Logger = logger,
-                            },
-                        }))
+                        reports: logger.CreateReports()))
                 .Where(f => f != null)
                 .First();
 
@@ -71,40 +47,22 @@ namespace DocNuget.Models.Loader {
 
             var zipPackage = new ZipPackage(await feed.OpenNupkgStreamAsync(result));
 
-            var pa = new Package {
-                Id = zipPackage.Id,
-                Title = zipPackage.Title ?? zipPackage.Id,
-                Version = zipPackage.Version.ToString(),
-                Versions = packages.Select(p => p.Version.ToString()).ToList(),
-                Summary = zipPackage.Summary ?? zipPackage.Description,
-            };
-
-            pa.Assemblies = zipPackage.GetFiles()
-                    .Select(file => file.Path.StartsWith("lib") && file.Path.EndsWith("dll")
-                        ? new {
-                            Name = Path.GetFileNameWithoutExtension(file.Path.Split('\\').Last()),
-                            Framework = file.Path.Split('\\').Skip(1).First(),
-                        } : null)
-                    .Where(assembly => assembly != null)
-                    .GroupBy(assembly => assembly.Name)
-                    .Select(assemblies => new Models.Assembly {
-                        Name = assemblies.Key,
-                        Package = pa,
-                        Framework = assemblies.Select(assembly => assembly.Framework).FirstOrDefault(),
-                        Frameworks = assemblies.Select(assembly => assembly.Framework).ToList(),
-                    })
-                    .ToList();
-
-            return pa;
+            return Link(zipPackage.ToPackage(packages.Select(p => p.Version.ToString()).ToList()));
         }
 
-        private class LoggerReport : IReport {
-            public LogLevel LogLevel { get; set; }
+        private Package Link(Package package) {
+            foreach (var assembly in package.Assemblies) {
+                assembly.Package = package;
+                Link(assembly, assembly.RootNamespace);
+            }
 
-            public Microsoft.Framework.Logging.ILogger Logger { get; set; }
+            return package;
+        }
 
-            public void WriteLine(string message) {
-                Logger.Log(LogLevel, 0, message, null, null);
+        private void Link(Assembly assembly, Namespace @namespace) {
+            @namespace.Assembly = assembly;
+            foreach (var childNamespace in @namespace.Namespaces) {
+                Link(assembly, childNamespace);
             }
         }
     }
