@@ -9,6 +9,6 @@
     <li>{{> namespace Namespace }}</li>
   {{/ each }}
   {{# each Types as |Type| }}
-    <li><a href="/packages/{{ ../Assembly.Package.Id }}/{{ ../Assembly.Package.Version }}/assemblies/{{ ../Assembly.Name }}/{{ ../Assembly.Framework }}/namespaces/{{ ../Name }}/types/{{ Type.Name }}">{{ Type.Name }}</a></li>
+    <li><a href="/packages/{{ ../Assembly.Package.Id }}/{{ ../Assembly.Package.Version }}/assemblies/{{ ../Assembly.Name }}/types/{{ Type.FullName }}">{{ Type.Name }}</a></li>
   {{/ each }}
 </ul>

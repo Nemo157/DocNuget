@@ -47,23 +47,7 @@ namespace DocNuget.Models.Loader {
 
             var zipPackage = new ZipPackage(await feed.OpenNupkgStreamAsync(result));
 
-            return Link(zipPackage.ToPackage(packages.Select(p => p.Version.ToString()).ToList()));
-        }
-
-        private Package Link(Package package) {
-            foreach (var assembly in package.Assemblies) {
-                assembly.Package = package;
-                Link(assembly, assembly.RootNamespace);
-            }
-
-            return package;
-        }
-
-        private void Link(Assembly assembly, Namespace @namespace) {
-            @namespace.Assembly = assembly;
-            foreach (var childNamespace in @namespace.Namespaces) {
-                Link(assembly, childNamespace);
-            }
+            return zipPackage.ToPackage(packages.Select(p => p.Version.ToString()).ToList()).Link();
         }
     }
 }

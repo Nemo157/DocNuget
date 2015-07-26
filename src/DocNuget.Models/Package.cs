@@ -46,6 +46,12 @@ namespace DocNuget.Models {
     public class Type {
         public string Name { get; set; }
 
+        public string FullName { get; set; }
+
+        public string BaseType { get; set; }
+
+        public List<string> Interfaces { get; set; }
+
         public Namespace Namespace { get; set; }
     }
 

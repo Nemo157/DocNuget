@@ -40,6 +40,7 @@ var app = Sammy('#content', app => {
   app.get('/packages/:package/:version', apiRoute('package'))
   app.get('/packages/:package/:version/assemblies/:assembly', apiRoute('assembly', { namespace: 'assembly/namespace' }))
   app.get('/packages/:package/:version/assemblies/:assembly/:framework', apiRoute('assembly'))
+  app.get('/packages/:package/:version/assemblies/:assembly/types/:type', apiRoute('type'))
 
   app.get('/404', (route, next) => route.partial('/views/404.hb', route.params).then(next))
 

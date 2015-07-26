@@ -89,13 +89,19 @@ namespace DocNuget.Models.Loader {
 
             foreach (var group in types.GroupBy(type => type.Namespace)) {
                 var @namespace = Walk(root, group.Key.Split('.').Where(val => val != ""));
-                @namespace.Types = group.Select(type => new Type {
-                    Name = type.Name,
-                    Namespace = @namespace,
-                }).ToList();
+                @namespace.Types = group.Select(ToType).ToList();
             }
 
             return root;
+        }
+
+        public static Type ToType(this Mono.Cecil.TypeDefinition type) {
+            return new Type {
+                Name = type.Name,
+                FullName = type.FullName,
+                BaseType = type.BaseType?.FullName,
+                Interfaces = type.Interfaces?.Select(@interface => @interface.FullName).ToList(),
+            };
         }
 
         public static void Insert(Namespace @namespace, IEnumerable<string> path) {
@@ -123,6 +129,26 @@ namespace DocNuget.Models.Loader {
             }
 
             return Walk(@namespace.Namespaces.FirstOrDefault(ns => ns.Name == path.First()), path.Skip(1));
+        }
+
+        public static Package Link(this Package package) {
+            foreach (var assembly in package.Assemblies) {
+                assembly.Package = package;
+                Link(assembly, assembly.RootNamespace);
+            }
+
+            return package;
+        }
+
+        private static void Link(Assembly assembly, Namespace @namespace) {
+            @namespace.Assembly = assembly;
+            foreach (var childNamespace in @namespace.Namespaces) {
+                Link(assembly, childNamespace);
+            }
+
+            foreach (var type in @namespace.Types) {
+                type.Namespace = @namespace;
+            }
         }
     }
 }
