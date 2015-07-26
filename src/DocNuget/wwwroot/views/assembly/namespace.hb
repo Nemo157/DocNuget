@@ -4,7 +4,7 @@
 <b>
   <a href="/packages/{{ Assembly.Package.Id }}/{{ Assembly.Package.Version }}/assemblies/{{ Assembly.Name }}/{{ Assembly.Framework }}/namespaces/{{ FullName }}">{{ Name }}</a>
 </b>
-<ul id="collapse-ns-{{ replace FullName '.' '-' }}" class="collapse" style="list-style: none">
+<ul id="collapse-ns-{{ replace FullName '.' '-' }}" class="collapse in" style="list-style: none">
   {{# each Namespaces as |Namespace| }}
     <li>{{> namespace Namespace }}</li>
   {{/ each }}
