@@ -1,6 +1,5 @@
-using System;
 using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNet.Http;
 using Microsoft.AspNet.StaticFiles;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
@@ -19,12 +18,18 @@ namespace DocNuget {
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory) {
             loggerFactory.MinimumLevel = LogLevel.Debug;
             loggerFactory.AddConsole(LogLevel.Debug);
-            app.UseErrorPage();
-            app.UseDefaultFiles();
-            app.UseStaticFiles(new StaticFileOptions {
-                ServeUnknownFileTypes = true,
-            });
-            app.UseMvc();
+
+            app
+                .UseErrorPage()
+                .UseDefaultFiles()
+                .UseStaticFiles(new StaticFileOptions {
+                    ServeUnknownFileTypes = true,
+                })
+                .UseMvc()
+                .UseSendFileFallback()
+                .Use(async (context, next) => {
+                    await context.Response.SendFileAsync("wwwroot/index.html");
+                });
         }
     }
 }
