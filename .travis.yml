@@ -4,4 +4,4 @@ script:
   - ./build.sh verify
   - dnu publish src/DocNuget/project.json --out artifacts/deploy
 after_success:
-  "curl --ftp-create-dirs -T artifacts/deploy -u $AZURE_FTP_USERNAME:$AZURE_FTP_PASSWORD $AZURE_FTP_HOSTNAME"
+  "curl --ftp-create-dirs -T artifacts/deploy -u $AZURE_FTP_USERNAME:$AZURE_FTP_PASSWORD $AZURE_FTP_HOSTNAME/site"
