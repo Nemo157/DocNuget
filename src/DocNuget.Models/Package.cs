@@ -88,6 +88,8 @@ namespace DocNuget.Models {
 
         public List<Parameter> Parameters { get; set; }
 
+        public List<GenericParameter> GenericParameters { get; set; }
+
         public bool IsStatic { get; set; }
 
         public string Visibility { get; set; }
@@ -99,6 +101,12 @@ namespace DocNuget.Models {
         public TypeRef Type { get; set; }
 
         public object Default { get; set; }
+    }
+
+    public class GenericParameter {
+        public string Name { get; set; }
+
+        public List<TypeRef> Constraints { get; set; }
     }
 
     public class DependencySet {

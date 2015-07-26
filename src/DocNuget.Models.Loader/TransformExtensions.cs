@@ -125,8 +125,16 @@ namespace DocNuget.Models.Loader {
             return new TypeRef {
                 Name = CommonName(type.FullName) ?? type.Name,
                 FullName = type.FullName,
-                InAssembly = type.Resolve()?.Module?.Assembly == assembly,
+                InAssembly = type.TryResolve()?.Module?.Assembly == assembly,
             };
+        }
+
+        public static TypeDefinition TryResolve(this TypeReference type) {
+            try {
+                return type.Resolve();
+            } catch {
+                return null;
+            }
         }
 
         public static Method ToMethod(this MethodDefinition method, AssemblyDefinition assembly) {
@@ -135,6 +143,7 @@ namespace DocNuget.Models.Loader {
                 FullName = method.FullName,
                 ReturnType = method.ReturnType.ToTypeRef(assembly),
                 Parameters = method.Parameters.Select(parameter => parameter.ToParameter(assembly)).ToList(),
+                GenericParameters = method.GenericParameters.Select(parameter => parameter.ToGenericParameter(assembly)).ToList(),
                 IsStatic = method.IsStatic,
                 Visibility = method.IsPublic ? "public" : method.IsPrivate ? "private" : "<unknown>",
             };
@@ -145,6 +154,13 @@ namespace DocNuget.Models.Loader {
                 Name = parameter.Name,
                 Type = parameter.ParameterType.ToTypeRef(assembly),
                 Default = parameter.Constant,
+            };
+        }
+
+        public static GenericParameter ToGenericParameter(this Mono.Cecil.GenericParameter parameter, AssemblyDefinition assembly) {
+            return new GenericParameter {
+                Name = parameter.Name,
+                Constraints = parameter.Constraints.Select(constraint => constraint.ToTypeRef(assembly)).ToList(),
             };
         }
 
@@ -224,6 +240,7 @@ namespace DocNuget.Models.Loader {
             switch (name) {
                 case "System.Void": return "void";
                 case "System.Boolean": return "boolean";
+                case "System.Object": return "object";
                 default: return null;
             }
         }
