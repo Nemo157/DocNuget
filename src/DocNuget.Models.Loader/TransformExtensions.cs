@@ -1,13 +1,18 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
+using Microsoft.Framework.Logging;
 
 using Mono.Cecil;
 using NuGet;
 
+using ILogger = Microsoft.Framework.Logging.ILogger;
+
 namespace DocNuget.Models.Loader {
     internal static class TransformExtensions {
-        public static Package ToPackage(this ZipPackage zipPackage, List<string> otherVersions) {
+        public static Package ToPackage(this ZipPackage zipPackage, List<string> otherVersions, ILogger logger) {
             return new Package {
                 Id = zipPackage.Id,
                 Title = zipPackage.Title ?? zipPackage.Id,
@@ -18,11 +23,75 @@ namespace DocNuget.Models.Loader {
                     .Select(set => set?.ToDependencySet())
                     .ToList(),
                 Assemblies = zipPackage.GetFiles()
-                    .Where(file => file.Path.StartsWith("lib") && file.Path.EndsWith("dll"))
+                    .Where(file => file.Path.StartsWith("lib", StringComparison.OrdinalIgnoreCase))
+                    .Where(file => file.Path.EndsWith("dll", StringComparison.OrdinalIgnoreCase))
                     .GroupBy(file => Path.GetFileNameWithoutExtension(file.Path.Split('\\').Last()))
-                    .Select(assembly => assembly?.ToAssembly())
+                    .Select(assembly => assembly.ToAssembly().TryLoadHelp(zipPackage, logger))
                     .ToList()
             };
+        }
+
+        public static Assembly TryLoadHelp(this Assembly assembly, ZipPackage zipPackage, ILogger logger) {
+            logger.LogInformation("Looking for xml help for {0}", assembly.Name);
+            var helpFile = zipPackage.GetFiles().FirstOrDefault(file => file.Path.Equals(assembly.Path.Replace("dll", "xml"), StringComparison.OrdinalIgnoreCase)); 
+
+            if (helpFile != null) {
+                logger.LogInformation("Found xml help for {0}", assembly.Name);
+                var xml = XDocument.Load(helpFile.GetStream());
+                foreach (var member in xml.Element("doc").Element("members").Elements("member")) {
+                    var name = member.Attribute("name")?.Value;
+                    if (name == null) {
+                        continue;
+                    }
+
+                    logger.LogDebug("Found xml help for member {0}", name);
+                    try {
+                        switch (name.First()) {
+                            case 'T': {
+                                var type = assembly.FindType(name.Substring(2));
+                                if (type != null) {
+                                    type.Summary = member.Descendants("summary").FirstOrDefault()?.Value;
+                                }
+                                break;
+                            }
+
+                            case 'M': {
+                                var argStart = name.IndexOf('(');
+                                if (argStart < 2) {
+                                    continue;
+                                }
+                                var methodName = name.Substring(2, argStart - 2);
+                                var typeName = methodName.Substring(0, methodName.LastIndexOf('.'));
+                                methodName = methodName.Substring(methodName.LastIndexOf('.') + 1);
+                                var type = assembly.FindType(typeName);
+                                if (type != null) {
+                                    var method = type.Methods.FirstOrDefault(m => m.Name == methodName);
+                                    if (method != null) {
+                                        method.Summary = member.Descendants("summary").FirstOrDefault()?.Value;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    } catch (Exception ex) {
+                        logger.LogError("Failed to pull out help details", ex);
+                    }
+                }
+            }
+
+            return assembly;
+        }
+
+        public static IEnumerable<Type> GetAllTypes(this Assembly assembly) {
+            return assembly.RootNamespace.GetAllTypes();
+        }
+
+        public static IEnumerable<Type> GetAllTypes(this Namespace @namespace) {
+            return @namespace.Types.Concat(@namespace.Namespaces.SelectMany(GetAllTypes));
+        }
+
+        public static Type FindType(this Assembly assembly, string name) {
+            return assembly.GetAllTypes().FirstOrDefault(type => type.FullName == name);
         }
 
         public static DependencySet ToDependencySet(this PackageDependencySet set) {
@@ -61,6 +130,7 @@ namespace DocNuget.Models.Loader {
 
             var assembly = new Assembly {
                 Name = files.Key,
+                Path = file.Path,
                 TargetFramework = file.TargetFramework?.ToFramework(),
                 TargetFrameworks = files.Select(f => f.TargetFramework?.ToFramework())
                     .Where(f => f != null)

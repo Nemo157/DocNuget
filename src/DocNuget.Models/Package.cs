@@ -22,6 +22,8 @@ namespace DocNuget.Models {
 
         public string Name { get; set; }
 
+        public string Path { get; set; }
+
         public Framework TargetFramework { get; set; }
 
         public List<Framework> TargetFrameworks { get; set; }
@@ -47,6 +49,8 @@ namespace DocNuget.Models {
         public string Name { get; set; }
 
         public string FullName { get; set; }
+
+        public string Summary { get; set; }
 
         public TypeRef BaseType { get; set; }
 
@@ -83,6 +87,8 @@ namespace DocNuget.Models {
         public string Name { get; set; }
 
         public string FullName { get; set; }
+
+        public string Summary { get; set; }
 
         public TypeRef ReturnType { get; set; }
 

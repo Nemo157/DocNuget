@@ -2,6 +2,8 @@
   <h1>{{> type.name }}{{# if AllBaseTypes }} <small>: {{# join AllBaseTypes ', ' }}{{> type.link }}{{/ join }}</small>{{/ if }}</h1>
 </div>
 
+<p>{{ Summary }}</p>
+
 <dl class="dl-horizontal">
   <dt>Namespace</dt><dd>{{> namespace.link Namespace }}</dd>
   <dt>Assembly</dt><dd>{{> assembly.link Assembly }}</dd>
@@ -22,6 +24,7 @@
           {{/ if }}
         {{/ each }}
       </code>
+      <p>{{ Summary }}</p>
     </div>
   {{/ each }}
 {{/ if }}
