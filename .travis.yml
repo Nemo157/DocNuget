@@ -1,6 +1,7 @@
 language: csharp
-sudo: false
+sudo: true
 script:
   - ./build.sh verify dnu-publish
 after_success:
+  - sudo apt-get install -y ncftp
   - ncftpput -R -v -u $AZURE_FTP_USERNAME -p $AZURE_FTP_PASSWORD $AZURE_FTP_HOSTNAME / artifacts/site
