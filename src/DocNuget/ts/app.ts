@@ -10,7 +10,8 @@ import resolve from './resolve'
 var a = $
 var b = bootstrap
 
-Handlebars.registerHelper('replace', (str: string, substr: string, newSubStr: string) => str.replace(new RegExp(substr, 'g'), newSubStr))
+Handlebars.registerHelper('replace', (str: string, substr: string, newSubStr: string) => str && str.replace(new RegExp(substr, 'g'), newSubStr))
+Handlebars.registerHelper('join', (context: any[], sep: string, options: any) => (context || []).map(item => options.fn(item).trim()).join(sep))
 
 var app = Sammy('#content', app => {
   app.debug = true
@@ -18,12 +19,21 @@ var app = Sammy('#content', app => {
   app.use(fade)
   app.setLocationProxy(new PushLocationProxy(app, 'a', 'body'))
 
+  var defaultPartials : { [key: string]: string } = {
+    'type.name': '/views/type/name.hb',
+    'type.link': '/views/type/link.hb',
+    'assembly.link': '/views/assembly/link.hb',
+    'namespace.link': '/views/namespace/link.hb',
+    'package.link': '/views/package/link.hb',
+  }
+
   var basicRoute = (partial: string) => (route: Sammy.EventContext, next: () => void) => route
     .partial('/views/' + partial + '.hb')
     .then(next)
 
   var apiRoute = (partial: string, partials: { [key: string]: string } = {}) => {
     var map: { [key: string]: string } = {}
+    Object.keys(defaultPartials).forEach(key => map[key] = defaultPartials[key])
     Object.keys(partials).forEach(key => map[key] = '/views/' + partials[key] + '.hb')
     return (route: Sammy.EventContext, next: () => void) => route
       .loadPartials(map)

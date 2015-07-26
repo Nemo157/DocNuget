@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using Mono.Cecil;
 using NuGet;
 
 namespace DocNuget.Models.Loader {
@@ -54,7 +55,7 @@ namespace DocNuget.Models.Loader {
 
         public static Assembly ToAssembly(this IGrouping<string, IPackageFile> files) {
             var file = files.First();
-            var reflectedAssembly = Mono.Cecil.AssemblyDefinition.ReadAssembly(file.GetStream());
+            var reflectedAssembly = AssemblyDefinition.ReadAssembly(file.GetStream());
 
             var types = reflectedAssembly.Modules.SelectMany(module => module.Types).Where(type => type.IsPublic);
 
@@ -67,13 +68,13 @@ namespace DocNuget.Models.Loader {
                 SupportedFrameworks = file.SupportedFrameworks
                     .Select(ToFramework)
                     .ToList(),
-                RootNamespace = ToNamespaceTree(types),
+                RootNamespace = ToNamespaceTree(types, reflectedAssembly),
             };
 
             return assembly;
         }
 
-        public static Namespace ToNamespaceTree(this IEnumerable<Mono.Cecil.TypeDefinition> types) {
+        public static Namespace ToNamespaceTree(this IEnumerable<TypeDefinition> types, AssemblyDefinition assembly) {
             var namespaces = types.Select(type => type.Namespace).Where(ns => ns != "").Distinct();
 
             var root = new Namespace {
@@ -89,18 +90,61 @@ namespace DocNuget.Models.Loader {
 
             foreach (var group in types.GroupBy(type => type.Namespace)) {
                 var @namespace = Walk(root, group.Key.Split('.').Where(val => val != ""));
-                @namespace.Types = group.Select(ToType).ToList();
+                @namespace.Types = group.Select(type => type.ToType(assembly)).ToList();
             }
 
             return root;
         }
 
-        public static Type ToType(this Mono.Cecil.TypeDefinition type) {
+        public static Type ToType(this TypeDefinition type, AssemblyDefinition assembly) {
+            var baseType = type.BaseType?.ToTypeRef(assembly);
+            var interfaces = type.Interfaces?.Select(@interface => @interface.ToTypeRef(assembly)).ToList();
+            var allBaseTypes = baseType == null || baseType.FullName == "System.Object" || baseType.FullName == "System.ValueType"
+                ? interfaces
+                : new[] { baseType }.Concat(interfaces).ToList();
+
             return new Type {
-                Name = type.Name,
+                Name = CommonName(type.FullName) ?? type.Name,
                 FullName = type.FullName,
-                BaseType = type.BaseType?.FullName,
-                Interfaces = type.Interfaces?.Select(@interface => @interface.FullName).ToList(),
+                BaseType = baseType,
+                Interfaces = interfaces,
+                AllBaseTypes = allBaseTypes,
+                InAssembly = type.Module.Assembly == assembly,
+                Methods = type.Methods
+                    .Where(method => !(method.IsConstructor || method.IsSetter || method.IsGetter))
+                    .Select(method => method.ToMethod(assembly))
+                    .ToList(),
+                Constructors = type.Methods
+                    .Where(method => method.IsConstructor)
+                    .Select(method => method.ToMethod(assembly))
+                    .ToList(),
+            };
+        }
+
+        public static TypeRef ToTypeRef(this TypeReference type, AssemblyDefinition assembly) {
+            return new TypeRef {
+                Name = CommonName(type.FullName) ?? type.Name,
+                FullName = type.FullName,
+                InAssembly = type.Resolve()?.Module?.Assembly == assembly,
+            };
+        }
+
+        public static Method ToMethod(this MethodDefinition method, AssemblyDefinition assembly) {
+            return new Method {
+                Name = method.Name,
+                FullName = method.FullName,
+                ReturnType = method.ReturnType.ToTypeRef(assembly),
+                Parameters = method.Parameters.Select(parameter => parameter.ToParameter(assembly)).ToList(),
+                IsStatic = method.IsStatic,
+                Visibility = method.IsPublic ? "public" : method.IsPrivate ? "private" : "<unknown>",
+            };
+        }
+
+        public static Parameter ToParameter(this ParameterDefinition parameter, AssemblyDefinition assembly) {
+            return new Parameter {
+                Name = parameter.Name,
+                Type = parameter.ParameterType.ToTypeRef(assembly),
+                Default = parameter.Constant,
             };
         }
 
@@ -148,6 +192,39 @@ namespace DocNuget.Models.Loader {
 
             foreach (var type in @namespace.Types) {
                 type.Namespace = @namespace;
+                type.Assembly = assembly;
+
+                Link(assembly, type.BaseType);
+                Link(assembly, type.Interfaces);
+                Link(assembly, type.GenericArguments);
+                Link(assembly, type.Methods.SelectMany(method => new[] { method.ReturnType }.Concat(method.Parameters.Select(parameter => parameter.Type))));
+            }
+        }
+
+        private static void Link(Assembly assembly, TypeRef type) {
+            if (type == null) {
+                return;
+            }
+            if (type.InAssembly) {
+                type.Assembly = assembly;
+            }
+            Link(assembly, type.GenericArguments);
+        }
+
+        private static void Link(Assembly assembly, IEnumerable<TypeRef> types) {
+            if (types == null) {
+                return;
+            }
+            foreach (var type in types) {
+                Link(assembly, type);
+            }
+        }
+
+        private static string CommonName(string name) {
+            switch (name) {
+                case "System.Void": return "void";
+                case "System.Boolean": return "boolean";
+                default: return null;
             }
         }
     }

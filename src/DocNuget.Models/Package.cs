@@ -48,11 +48,57 @@ namespace DocNuget.Models {
 
         public string FullName { get; set; }
 
-        public string BaseType { get; set; }
+        public TypeRef BaseType { get; set; }
 
-        public List<string> Interfaces { get; set; }
+        public List<TypeRef> AllBaseTypes { get; set; }
+
+        public List<TypeRef> Interfaces { get; set; }
+
+        public List<TypeRef> GenericArguments { get; set; }
+
+        public bool InAssembly { get; set; }
+
+        public Assembly Assembly { get; set; }
 
         public Namespace Namespace { get; set; }
+
+        public List<Method> Methods { get; set; }
+
+        public List<Method> Constructors { get; set; }
+    }
+
+    public class TypeRef {
+        public string Name { get; set; }
+
+        public string FullName { get; set; }
+
+        public List<TypeRef> GenericArguments { get; set; }
+
+        public bool InAssembly { get; set; }
+
+        public Assembly Assembly { get; set; }
+    }
+
+    public class Method {
+        public string Name { get; set; }
+
+        public string FullName { get; set; }
+
+        public TypeRef ReturnType { get; set; }
+
+        public List<Parameter> Parameters { get; set; }
+
+        public bool IsStatic { get; set; }
+
+        public string Visibility { get; set; }
+    }
+
+    public class Parameter {
+        public string Name { get; set; }
+
+        public TypeRef Type { get; set; }
+
+        public object Default { get; set; }
     }
 
     public class DependencySet {

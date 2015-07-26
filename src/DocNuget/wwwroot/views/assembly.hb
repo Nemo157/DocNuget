@@ -2,6 +2,10 @@
   <h1>{{ Name }} <small><code>{{ Framework }}</code></small></h1>
 </div>
 
+<dl class="dl-horizontal">
+  <dt>Package</dt><dd>{{> package.link Package }}</dd>
+</dl>
+
 <h2>Classes</h2>
 <ul style="list-style: none">
   <li>{{> namespace RootNamespace }}</li>
