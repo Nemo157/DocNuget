@@ -1,0 +1,13 @@
+@{/*
+
+dnu-publish
+
+projectFile=''
+    Required. Path to the project.json to publish.
+
+dnuPublishOutputDir=''
+    Required. Base output directory.
+*/}
+
+exec program='cmd' commandline='/C dnu publish ${projectFile} --out ${dnuPublishOutputDir}' if='!IsMono'
+exec program='dnu' commandline='publish ${projectFile} --out ${dnuPublishOutputDir}' if='IsMono'

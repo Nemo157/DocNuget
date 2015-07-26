@@ -6,3 +6,4 @@ use-standard-lifecycle
 webpack-goals
 tsd-goals
 k-standard-goals
+dnu-goals webProject='src/DocNuget/project.json'

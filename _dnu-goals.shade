@@ -1,0 +1,5 @@
+default BASE_DIR='${Directory.GetCurrentDirectory()}'
+default TARGET_DIR='${Path.Combine(BASE_DIR, "artifacts")}'
+
+#dnu-publish .package target='publish'
+  dnu-publish projectFile='${webProject}' dnuPublishOutputDir='${Path.Combine(TARGET_DIR, "site")}'
