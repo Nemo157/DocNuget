@@ -10,7 +10,7 @@ import resolve from './resolve'
 var a = $
 var b = bootstrap
 
-Handlebars.registerHelper('replace', (str: string, substr: string, newSubStr: string) => str.replace(substr, newSubStr))
+Handlebars.registerHelper('replace', (str: string, substr: string, newSubStr: string) => str.replace(new RegExp(substr, 'g'), newSubStr))
 
 var app = Sammy('#content', app => {
   app.debug = true
