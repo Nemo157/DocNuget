@@ -3,4 +3,4 @@ sudo: false
 script:
   - ./build.sh verify dnu-publish
 after_success:
-  "curl --ftp-create-dirs -T artifacts/site -u $AZURE_FTP_USERNAME:$AZURE_FTP_PASSWORD $AZURE_FTP_HOSTNAME/site"
+  - ncftpput -R -v -u $AZURE_FTP_USERNAME -p $AZURE_FTP_PASSWORD $AZURE_FTP_HOSTNAME / artifacts/site
