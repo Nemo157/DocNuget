@@ -1,14 +1,23 @@
 language: csharp
 sudo: false
+
 env:
   - Configuration=Release
+
 script:
-  - ./build.sh verify dnu-publish
+  - ./build.sh verify
+
+before_deploy:
+  - ./build.sh dnu-publish
   - tar -czf artifacts/DocNuget.tar.gz artifacts/DocNuget
+
 deploy:
   provider: releases
   api_key:
     secure: fSbgm06DvfZTUwRQkbD+Q3wjkr36xirQJwXiwm4IEJfr450dzu58xruyG0ML9WSQWc+uHZ/H6m1vPJd5klTdaErgjGa/7uo8q7vSE1DykMqNgow2jwiFqj2F9WF7oA5Dqld+gULpjFmQueObY6xUsemQRJZg2NkSv37iaYWHoXYcRrsGjbl3/IN+0/NkuQfbC26OdY3B3s0kTegSy5ZX/4NlLMBo8a/5so30r00eZM648nYT/sO2W0VqmWfor7CJeh4teLAnvlzLTFPl9G+gMIhmJYvURg7JxgYCuyNciCK3o3W3TO/eFN0k7zD/G2toqYhsWPZXGEcA1zOzBkxo/YJJbVoB86lSXE54NxwoHs4xvqeZ3/SXQXPfeudotgRVAXidKvHSkxSZs3RmhTnuFEcUZ9X2XGnFrRiB/6G1CSe0X00QOYYiDYO1N/5zMP/IFjy08qXnwx8ALo8bLI8NZG8xKbTpdS11hTvKpEFD2LjFsKPC0Z8+SyJteCLUzWhEMjrX4eBcGdt1jXZk9hJ+TsX/9Etxiq+aR2DitLaNDyV8oMo8eZ7MK1aAFYobZdHPe+jhPDVS1wB7YNSdd43aMNnKx70cTOGvNY49NwhNg5XPlvqb1yhszSCDY7h0kYw1XGW53o264h3CVBqRs03FqOxgmCn+2H2N9VdDWhryicg=
   file: artifacts/DocNuget.tar.gz
+  skip_cleanup: true
   on:
+    tags: true
     repo: Nemo157/DocNuget
+    all_branches: true
