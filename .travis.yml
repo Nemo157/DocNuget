@@ -9,7 +9,7 @@ addons:
 script:
   - ./build.sh verify dnu-publish
 after_success:
-  - sed -i 's/key="bootstrapper-version" value="[^"]+"/key="bootstrapper-version" value="1.0.0-beta5"' artifacts/site/wwwroot/web.config
-  - sed -i 's/key="dnx-version" value=""/key="dnx-version" value="1.0.0-beta5"' artifacts/site/wwwroot/web.config
-  - sed -i 's/key="dnx-clr" value=""/key="dnx-clr" value="clr"' artifacts/site/wwwroot/web.config
+  - sed -i 's/key="bootstrapper-version" value="[^"]+"/key="bootstrapper-version" value="1.0.0-beta5"/' artifacts/site/wwwroot/web.config
+  - sed -i 's/key="dnx-version" value=""/key="dnx-version" value="1.0.0-beta5"/' artifacts/site/wwwroot/web.config
+  - sed -i 's/key="dnx-clr" value=""/key="dnx-clr" value="clr"/' artifacts/site/wwwroot/web.config
   - ncftpput -R -v -u $AZURE_FTP_USERNAME -p $AZURE_FTP_PASSWORD $AZURE_FTP_HOSTNAME / artifacts/site
