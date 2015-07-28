@@ -22,7 +22,7 @@ default configuration='Debug'
 default source=true
 default runtime=''
 
-var runtimeArg = '${ string.IsNullOrEmpty(runtime) ? "" : $"--runtime {runtime}" }'
+var runtimeArg = '${ string.IsNullOrEmpty(runtime) ? "" : "--runtime " + runtime }'
 var noSourceArg = '${ source ? "" : "--no-source" }'
 
 exec program='cmd' commandline='/C dnu publish ${projectFile} --out ${dnuPublishOutputDir} --configuration ${configuration} ${runtimeArg} ${noSourceArg}' if='!IsMono'
