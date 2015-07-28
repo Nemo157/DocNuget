@@ -1,0 +1,18 @@
+init:
+  - git config --global core.autocrlf true
+
+build_script:
+  - build.cmd verify dnu-publish
+
+test: off
+
+artifacts:
+  - path: artifacts/DocNuget
+
+deploy:
+  providor: GitHub
+  auth_token:
+    secure: tz5U/3U7UZXHeMIw1WkgPAuf6gmrHD9ekFPizrCabjfYrgqtKeQq+a6T3Vp9dNcF
+  artifact: artifacts/DocNuget.zip
+  on:
+    appveyor_repo_tag: true
