@@ -9,7 +9,7 @@ script:
 
 before_deploy:
   - ./build.sh dnu-publish
-  - tar -czf artifacts/DocNuget.tar.gz artifacts/DocNuget
+  - tar -C artifacts -czf DocNuget.tar.gz DocNuget
 
 deploy:
   provider: releases
