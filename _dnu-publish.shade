@@ -7,7 +7,18 @@ projectFile=''
 
 dnuPublishOutputDir=''
     Required. Base output directory.
+
+configuration=''
+    Optional. The configuration to build in. Defaults to 'Debug'.
+
+source=true
+    Optional. Whether to output source files or nupkgs. Defaults to true.
 */}
 
-exec program='cmd' commandline='/C dnu publish ${projectFile} --out ${dnuPublishOutputDir}' if='!IsMono'
-exec program='dnu' commandline='publish ${projectFile} --out ${dnuPublishOutputDir}' if='IsMono'
+default configuration='Debug'
+default source=true
+
+var noSourceArg = '${ source ? "" : "--no-source" }'
+
+exec program='cmd' commandline='/C dnu publish ${projectFile} --out ${dnuPublishOutputDir} --configuration ${configuration} ${noSourceArg}' if='!IsMono'
+exec program='dnu' commandline='publish ${projectFile} --out ${dnuPublishOutputDir} --configuration ${configuration} ${noSourceArg}' if='IsMono'
