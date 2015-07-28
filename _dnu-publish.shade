@@ -13,12 +13,17 @@ configuration=''
 
 source=true
     Optional. Whether to output source files or nupkgs. Defaults to true.
+
+runtime=''
+    Optional. The runtime to include. Defaults to none.
 */}
 
 default configuration='Debug'
 default source=true
+default runtime=''
 
+var runtimeArg = '${ string.IsNullOrEmpty(runtime) ? "" : $"--runtime {runtime}" }'
 var noSourceArg = '${ source ? "" : "--no-source" }'
 
-exec program='cmd' commandline='/C dnu publish ${projectFile} --out ${dnuPublishOutputDir} --configuration ${configuration} ${noSourceArg}' if='!IsMono'
-exec program='dnu' commandline='publish ${projectFile} --out ${dnuPublishOutputDir} --configuration ${configuration} ${noSourceArg}' if='IsMono'
+exec program='cmd' commandline='/C dnu publish ${projectFile} --out ${dnuPublishOutputDir} --configuration ${configuration} ${runtimeArg} ${noSourceArg}' if='!IsMono'
+exec program='dnu' commandline='publish ${projectFile} --out ${dnuPublishOutputDir} --configuration ${configuration} ${runtimeArg} ${noSourceArg}' if='IsMono'
