@@ -5,7 +5,7 @@ COPY . /source
 
 RUN \
   apt-get update && \
-  apt-get install -y node && \
+  apt-get install -y nodejs && \
   cd /source && \
   Configuration=Release ./build.sh dnu-publish && \
   mv /source/artifacts/site /site && \
