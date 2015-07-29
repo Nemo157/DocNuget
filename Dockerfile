@@ -10,6 +10,7 @@ RUN \
   apt-get update && \
   apt-get install -y nodejs && \
   cd /source && \
+  dnvm install 1.0.0-beta5 && \
   Configuration=Release ./build.sh dnu-publish && \
   mv /source/artifacts/site /site && \
   rm /source
