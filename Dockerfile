@@ -3,7 +3,7 @@ MAINTAINER Wim Looman <wim@nemo157.com>
 
 COPY . /source
 
-RUN Configuration=Release /source/build.sh dnu-publish && mv /source/artifacts/site /site
+RUN cd /source && Configuration=Release ./build.sh dnu-publish && mv /source/artifacts/site /site
 
 EXPOSE 80
 WORKDIR /site
