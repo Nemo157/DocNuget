@@ -10,7 +10,7 @@ RUN \
   apt-get update && \
   apt-get install -y nodejs && \
   cd /source && \
-  Configuration=Release ./build.sh dnu-publish && \
+  DNX_FEED=https://www.nuget.org/api/v2 Configuration=Release ./build.sh dnu-publish && \
   mv /source/artifacts/site /site && \
   rm /source
 
