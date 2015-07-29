@@ -2,8 +2,9 @@ language: csharp
 sudo: false
 
 env:
-  - Configuration=Release
-  - DNX_FEED=https://www.nuget.org/api/v2
+  global:
+    - Configuration=Release
+    - DNX_FEED=https://www.nuget.org/api/v2
 
 script:
   - ./build.sh verify
