@@ -31,26 +31,49 @@ var app = Sammy('#content', app => {
     .partial('/views/' + partial + '.hb')
     .then(next)
 
-  var apiRoute = (partial: string, partials: { [key: string]: string } = {}) => {
+  var apiRoute = (partial: string, partials: { [key: string]: string } = {}, getData: (route: Sammy.EventContext, pkg: any) => any = (route, pkg) => pkg) => {
     var map: { [key: string]: string } = {}
     Object.keys(defaultPartials).forEach(key => map[key] = defaultPartials[key])
     Object.keys(partials).forEach(key => map[key] = '/views/' + partials[key] + '.hb')
     return (route: Sammy.EventContext, next: () => void) => route
       .loadPartials(map)
-      .load('/api' + route.path)
+      .load('/api/packages/' + route.params.package + (route.params.version ? '/' + route.params.version : ''))
       .then(JSON.parse)
       .then(resolve)
+      .then(pkg => getData(route, pkg))
       .partial('/views/' + partial + '.hb')
       .then(next)
   }
+
+  var findAssembly = (pkg: any, name: string, framework?: string) => pkg
+    .Assemblies
+    .find((assembly: any) => assembly.Name === name && (!framework || (assembly.TargetFramework && assembly.TargetFramework.FullName === framework)))
+
+  var allTypes = (namespace: any) => namespace.Types.concat(...namespace.Namespaces.map(allTypes))
+
+  var findType = (assembly: any, name: string) => allTypes(assembly.RootNamespace)
+    .find((type: any) => type.FullName === name)
 
   app.get('/', basicRoute('index'))
   app.get('/about', basicRoute('about'))
   app.get('/packages/:package', apiRoute('package'))
   app.get('/packages/:package/:version', apiRoute('package'))
-  app.get('/packages/:package/:version/assemblies/:assembly', apiRoute('assembly', { namespace: 'assembly/namespace' }))
-  app.get('/packages/:package/:version/assemblies/:assembly/:framework', apiRoute('assembly'))
-  app.get('/packages/:package/:version/assemblies/:assembly/types/:type', apiRoute('type'))
+
+  app.get('/packages/:package/:version/assemblies/:assembly',
+    apiRoute('assembly', { namespace: 'assembly/namespace' },
+      (route, pkg) => findAssembly(pkg, route.params.assembly)))
+
+  app.get('/packages/:package/:version/assemblies/:assembly/:framework',
+    apiRoute('assembly', { namespace: 'assembly/namespace' },
+      (route, pkg) => findAssembly(pkg, route.params.assembly, route.params.framework)))
+
+  app.get('/packages/:package/:version/assemblies/:assembly/types/:type',
+    apiRoute('type', {},
+      (route, pkg) => findType(findAssembly(pkg, route.params.assembly), route.params.type)))
+
+  app.get('/packages/:package/:version/assemblies/:assembly/:framework/types/:type',
+    apiRoute('type', {},
+      (route, pkg) => findType(findAssembly(pkg, route.params.assembly, route.params.framework), route.params.type)))
 
   app.get('/404', (route, next) => route.partial('/views/404.hb', route.params).then(next))
 
