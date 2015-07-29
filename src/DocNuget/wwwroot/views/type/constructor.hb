@@ -1,7 +1,7 @@
 {{# ifAccessible Constructor }}
   <div>
-    {{ accessibilityDebug Constructor }}
     <h5>
+      {{ accessibilityDebug Constructor }}
       {{ Accessibility }}
       {{ replace Type.Name '`\d+$' '' ~}}
       (

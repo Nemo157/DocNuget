@@ -150,3 +150,37 @@ var app = Sammy('#content', app => {
 })
 
 app.run()
+
+interface BootswatchTheme {
+  name: string
+  description: string
+  cssCdn: string
+}
+
+interface BootswatchThemes {
+  version: string
+  themes: BootswatchTheme[]
+}
+
+$(() => {
+  $.get('http://api.bootswatch.com/3/', (data: BootswatchThemes) => {
+    $('#theme-selector ul')
+      .append(
+        data.themes.map((value, index) => {
+          var li = $('<li />')
+            .append(
+              $('<a />')
+                .attr('href', '#')
+                .append(
+                  $('<b />').text(value.name),
+                  ' ',
+                  $('<small />').text(value.description))
+                .click(() => {
+                  $('#theme-selector ul li').removeClass('active')
+                  li.addClass('active')
+                  $('#bootstrap').attr('href', value.cssCdn)
+                }))
+            return li
+        }))
+  }, 'json')
+})
