@@ -1,5 +1,15 @@
 <div class="page-header">
-  <h1>{{> type.name Package=Package Assembly=Assembly Type=Type }}{{# if Type.AllBaseTypes }} <small>: {{# join Type.AllBaseTypes ', ' }}{{> type.link Package=../Package Assembly=../Assembly Type=. }}{{/ join }}</small>{{/ if }}</h1>
+  <h1>
+    {{~ Type.Accessibility }}
+    {{> type.name Package=Package Assembly=Assembly Type=Type ~}}
+    {{~# if Type.AllBaseTypes }}
+      <small>:
+      {{# join Type.AllBaseTypes ', ' ~}}
+        {{~> type.link Package=../Package Assembly=../Assembly Type=. ~}}
+      {{~/ join ~}}
+      </small>
+    {{~/ if ~}}
+  </h1>
 </div>
 
 <p>{{ Type.Summary }}</p>

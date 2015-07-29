@@ -49,10 +49,7 @@ namespace DocNuget.Models.Loader {
                     try {
                         switch (name.First()) {
                             case 'T': {
-                                var type = assembly.FindType(name.Substring(2));
-                                if (type != null) {
-                                    type.Summary = member.Descendants("summary").FirstOrDefault()?.Value;
-                                }
+                                assembly.FindType(name.Substring(2))?.LoadHelp(member);
                                 break;
                             }
 
@@ -64,13 +61,7 @@ namespace DocNuget.Models.Loader {
                                 var methodName = name.Substring(2, argStart - 2);
                                 var typeName = methodName.Substring(0, methodName.LastIndexOf('.'));
                                 methodName = methodName.Substring(methodName.LastIndexOf('.') + 1);
-                                var type = assembly.FindType(typeName);
-                                if (type != null) {
-                                    var method = type.Methods.FirstOrDefault(m => m.Name == methodName);
-                                    if (method != null) {
-                                        method.Summary = member.Descendants("summary").FirstOrDefault()?.Value;
-                                    }
-                                }
+                                assembly.FindType(typeName)?.Methods.FirstOrDefault(m => m.Name == methodName)?.LoadHelp(member);
                                 break;
                             }
                         }
@@ -81,6 +72,18 @@ namespace DocNuget.Models.Loader {
             }
 
             return assembly;
+        }
+
+        public static void LoadHelp(this Type type, XElement element) {
+            type.Summary = element.Descendants("summary").FirstOrDefault()?.ToHelpString();
+        }
+
+        public static void LoadHelp(this Method method, XElement element) {
+            method.Summary = element.Descendants("summary").FirstOrDefault()?.ToHelpString();
+        }
+
+        public static string ToHelpString(this XElement element) {
+            return element.DescendantNodes().Aggregate("", (acc, des) => acc + des.ToString());
         }
 
         public static IEnumerable<Type> GetAllTypes(this Assembly assembly) {
@@ -127,7 +130,7 @@ namespace DocNuget.Models.Loader {
             var file = files.First();
             var reflectedAssembly = AssemblyDefinition.ReadAssembly(file.GetStream());
 
-            var types = reflectedAssembly.Modules.SelectMany(module => module.Types).Where(type => type.IsPublic);
+            var types = reflectedAssembly.Modules.SelectMany(module => module.Types);
 
             var assembly = new Assembly {
                 Name = files.Key,
@@ -190,6 +193,12 @@ namespace DocNuget.Models.Loader {
                     .Where(method => method.IsConstructor)
                     .Select(method => method.ToMethod(assembly))
                     .ToList(),
+                Accessibility =
+                    type.IsPublic ? "public" :
+                    type.IsNestedPrivate ? "private" :
+                    type.IsNestedFamilyAndAssembly ? "protected internal" :
+                    type.IsNestedFamily ? "protected" :
+                    "internal",
             };
         }
 
@@ -236,7 +245,12 @@ namespace DocNuget.Models.Loader {
                 Parameters = method.Parameters.Select(parameter => parameter.ToParameter(assembly)).ToList(),
                 GenericParameters = method.GenericParameters.Select(parameter => parameter.ToGenericParameter(assembly)).ToList(),
                 IsStatic = method.IsStatic,
-                Visibility = method.IsPublic ? "public" : method.IsPrivate ? "private" : "<unknown>",
+                Accessibility =
+                    method.IsPublic ? "public" :
+                    method.IsAssembly ? "internal" :
+                    method.IsFamilyAndAssembly ? "protected internal" :
+                    method.IsFamily ? "protected" :
+                    "private",
             };
         }
 

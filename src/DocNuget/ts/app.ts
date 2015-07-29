@@ -9,8 +9,44 @@ import fade from './sammy/fade'
 var a = $
 var b = bootstrap
 
+var Accessibility: {
+  [key: string]: number
+  none: number
+  public: number
+  protected: number
+  internal: number
+  private: number
+  all: number
+} = {
+  none: 0,
+  public: 1,
+  protected: 2,
+  internal: 4,
+  private: 8,
+  all: 15,
+}
+
+Accessibility['<unknown>'] = Accessibility.all
+Accessibility['protected internal'] = 6
+
+var settings = {
+  accessibility: Accessibility.public | Accessibility.protected,
+  accessibilityDebug: true,
+}
+
 Handlebars.registerHelper('replace', (str: string, substr: string, newSubStr: string) => str && str.replace(new RegExp(substr, 'g'), newSubStr))
 Handlebars.registerHelper('join', (context: any[], sep: string, options: any) => (context || []).map(item => options.fn(item).trim()).join(sep))
+Handlebars.registerHelper('ifAccessible', function (item: string, options: any) {
+  if ((settings.accessibility & Accessibility[item.Accessibility]) === Accessibility.none) {
+    if (settings.accessibilityDebug) {
+      return '<div class="alert alert-warning"><b>Hidden by accessibility</b>:' + options.fn(this) + '</div>'
+    } else {
+      return options.inverse(this)
+    }
+  } else {
+    return options.fn(this)
+  }
+})
 
 var app = Sammy('#content', app => {
   app.debug = true
