@@ -31,7 +31,7 @@ Accessibility['protected internal'] = 6
 
 var settings = {
   accessibility: Accessibility.public | Accessibility.protected,
-  accessibilityDebug: true,
+  accessibilityDebug: false,
 }
 
 Handlebars.registerHelper('replace', (str: string, substr: string, newSubStr: string) => str && str.replace(new RegExp(substr, 'g'), newSubStr))

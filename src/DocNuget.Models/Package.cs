@@ -39,6 +39,8 @@ namespace DocNuget.Models {
         public List<Namespace> Namespaces { get; set; }
 
         public List<Type> Types { get; set; }
+
+        public string Accessibility { get; set; }
     }
 
     public class Type {

@@ -156,6 +156,7 @@ namespace DocNuget.Models.Loader {
                 FullName = "",
                 Namespaces = new List<Namespace>(),
                 Types = new List<Type>(),
+                Accessibility = "private",
             };
 
             foreach (var @namespace in namespaces) {
@@ -165,9 +166,130 @@ namespace DocNuget.Models.Loader {
             foreach (var group in types.GroupBy(type => type.Namespace)) {
                 var @namespace = Walk(root, group.Key.Split('.').Where(val => val != ""));
                 @namespace.Types = group.Select(type => type.ToType(assembly)).ToList();
+                foreach (var type in @namespace.Types) {
+                    switch (@namespace.Accessibility) {
+                        case "protected internal":
+                            switch (type.Accessibility) {
+                                case "public":
+                                    @namespace.Accessibility = type.Accessibility;
+                                    break;
+                            }
+                            break;
+                        case "protected":
+                            switch (type.Accessibility) {
+                                case "public":
+                                case "protected internal":
+                                    @namespace.Accessibility = type.Accessibility;
+                                    break;
+                            }
+                            break;
+                        case "internal":
+                            switch (type.Accessibility) {
+                                case "public":
+                                case "protected internal":
+                                case "protected":
+                                    @namespace.Accessibility = type.Accessibility;
+                                    break;
+                            }
+                            break;
+                        case "private":
+                            switch (type.Accessibility) {
+                                case "public":
+                                case "protected internal":
+                                case "protected":
+                                case "internal":
+                                    @namespace.Accessibility = type.Accessibility;
+                                    break;
+                            }
+                            break;
+                    }
+                }
             }
 
+            UpdateNamespaceAccessibility(root);
+
             return root;
+        }
+
+        private static void UpdateNamespaceAccessibility(Namespace @namespace) {
+            foreach (var sub in @namespace.Namespaces) {
+                UpdateNamespaceAccessibility(sub);
+                switch (@namespace.Accessibility) {
+                    case "protected internal":
+                        switch (sub.Accessibility) {
+                            case "public":
+                                @namespace.Accessibility = sub.Accessibility;
+                                break;
+                        }
+                        break;
+                    case "protected":
+                        switch (sub.Accessibility) {
+                            case "public":
+                            case "protected internal":
+                                @namespace.Accessibility = sub.Accessibility;
+                                break;
+                        }
+                        break;
+                    case "internal":
+                        switch (sub.Accessibility) {
+                            case "public":
+                            case "protected internal":
+                            case "protected":
+                                @namespace.Accessibility = sub.Accessibility;
+                                break;
+                        }
+                        break;
+                    case "private":
+                        switch (sub.Accessibility) {
+                            case "public":
+                            case "protected internal":
+                            case "protected":
+                            case "internal":
+                                @namespace.Accessibility = sub.Accessibility;
+                                break;
+                        }
+                        break;
+                }
+            }
+
+            foreach (var type in @namespace.Types) {
+                switch (@namespace.Accessibility) {
+                    case "protected internal":
+                        switch (type.Accessibility) {
+                            case "public":
+                                @namespace.Accessibility = type.Accessibility;
+                                break;
+                        }
+                        break;
+                    case "protected":
+                        switch (type.Accessibility) {
+                            case "public":
+                            case "protected internal":
+                                @namespace.Accessibility = type.Accessibility;
+                                break;
+                        }
+                        break;
+                    case "internal":
+                        switch (type.Accessibility) {
+                            case "public":
+                            case "protected internal":
+                            case "protected":
+                                @namespace.Accessibility = type.Accessibility;
+                                break;
+                        }
+                        break;
+                    case "private":
+                        switch (type.Accessibility) {
+                            case "public":
+                            case "protected internal":
+                            case "protected":
+                            case "internal":
+                                @namespace.Accessibility = type.Accessibility;
+                                break;
+                        }
+                        break;
+                }
+            }
         }
 
         public static Type ToType(this TypeDefinition type, AssemblyDefinition assembly) {
@@ -282,6 +404,7 @@ namespace DocNuget.Models.Loader {
                     FullName = (@namespace.FullName == "" ? "" : @namespace.FullName + ".") + path.First(),
                     Namespaces = new List<Namespace>(),
                     Types = new List<Type>(),
+                    Accessibility = "private",
                 };
                 @namespace.Namespaces.Add(match);
             }

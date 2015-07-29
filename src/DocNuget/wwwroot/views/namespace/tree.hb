@@ -1,5 +1,10 @@
 {{# each Namespace.Namespaces as |Namespace| }}
-  <li>{{> namespace.tree-node Package=../Package Assembly=../Assembly Namespace=Namespace }}</li>
+  {{# ifAccessible Namespace }}
+    <li>
+      {{ accessibilityDebug Namespace }}
+      {{> namespace.tree-node Package=../../Package Assembly=../../Assembly Namespace=Namespace }}
+    </li>
+  {{/ ifAccessible }}
 {{/ each }}
 {{# each Namespace.Types as |Type| }}
   {{# ifAccessible Type }}
