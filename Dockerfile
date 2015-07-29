@@ -3,7 +3,13 @@ MAINTAINER Wim Looman <wim@nemo157.com>
 
 COPY . /source
 
-RUN cd /source && Configuration=Release ./build.sh dnu-publish && mv /source/artifacts/site /site
+RUN \
+  apt-get update && \
+  apt-get install -y node && \
+  cd /source && \
+  Configuration=Release ./build.sh dnu-publish && \
+  mv /source/artifacts/site /site && \
+  rm /source
 
 EXPOSE 80
 WORKDIR /site
