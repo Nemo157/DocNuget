@@ -1,0 +1,26 @@
+{{# ifAccessible Property }}
+  <div>
+    <h5>
+      {{ accessibilityDebug Property }}
+      {{ Property.Accessibility }}
+      {{> type.link Package=Package Assembly=Assembly Type=Property.Type }}
+      {{ Property.Name }}
+      {
+        {{# if Property.Getter }}
+          {{# unless (equals Property.Getter.Accessibility Property.Accessibility) }}
+            {{ Property.Getter.Accessibility }}
+          {{/ unless }}
+          get;
+        {{/ if }}
+        {{# if Property.Setter }}
+          {{# unless (equals Property.Setter.Accessibility Property.Accessibility) }}
+            {{ Property.Setter.Accessibility }}
+          {{/ unless }}
+          set;
+        {{/ if }}
+      }
+    </h5>
+
+    <p>{{ Property.Summary }}</p>
+  </div>
+{{/ ifAccessible }}

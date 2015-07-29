@@ -55,7 +55,9 @@ Handlebars.registerHelper('accessibilityDebug', function (item: { Accessibility:
   }
 })
 
-Handlebars.registerHelper('ifEach', (items: any[], title: string, options: any) => items ? '<h4>' + title + '</h4>' + items.map(options.fn).join('\n') : options.inverse(this))
+Handlebars.registerHelper('ifEach', (items: any[], title: string, options: any) => items && items.length ? '<h4>' + title + '</h4>' + items.map(options.fn).join('\n') : options.inverse(this))
+
+Handlebars.registerHelper('equals', (first: any, second: any, options: any) => first === second)
 
 var app = Sammy('#content', app => {
   app.debug = true
@@ -67,6 +69,7 @@ var app = Sammy('#content', app => {
     'type.name': '/views/type/name.hb',
     'type.link': '/views/type/link.hb',
     'type.method': '/views/type/method.hb',
+    'type.property': '/views/type/property.hb',
     'type.constructor': '/views/type/constructor.hb',
     'assembly.link': '/views/assembly/link.hb',
     'namespace.link': '/views/namespace/link.hb',

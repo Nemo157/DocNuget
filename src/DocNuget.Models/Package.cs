@@ -64,6 +64,8 @@ namespace DocNuget.Models {
 
         public List<Method> Methods { get; set; }
 
+        public List<Property> Properties { get; set; }
+
         public List<Method> Constructors { get; set; }
 
         public string Accessibility { get; set; }
@@ -95,6 +97,22 @@ namespace DocNuget.Models {
         public bool IsStatic { get; set; }
 
         public string Accessibility { get; set; }
+    }
+
+    public class Property {
+        public string Name { get; set; }
+
+        public string FullName { get; set; }
+
+        public string Summary { get; set; }
+
+        public string Accessibility { get; set; }
+
+        public TypeRef Type { get; set; }
+
+        public Method Getter { get; set; }
+
+        public Method Setter { get; set; }
     }
 
     public class Parameter {

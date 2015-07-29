@@ -169,44 +169,6 @@ namespace DocNuget.Models.Loader {
             foreach (var group in types.GroupBy(type => type.Namespace)) {
                 var @namespace = Walk(root, group.Key.Split('.').Where(val => val != ""));
                 @namespace.Types = group.Select(type => type.ToType(assembly)).ToList();
-                foreach (var type in @namespace.Types) {
-                    switch (@namespace.Accessibility) {
-                        case "protected internal":
-                            switch (type.Accessibility) {
-                                case "public":
-                                    @namespace.Accessibility = type.Accessibility;
-                                    break;
-                            }
-                            break;
-                        case "protected":
-                            switch (type.Accessibility) {
-                                case "public":
-                                case "protected internal":
-                                    @namespace.Accessibility = type.Accessibility;
-                                    break;
-                            }
-                            break;
-                        case "internal":
-                            switch (type.Accessibility) {
-                                case "public":
-                                case "protected internal":
-                                case "protected":
-                                    @namespace.Accessibility = type.Accessibility;
-                                    break;
-                            }
-                            break;
-                        case "private":
-                            switch (type.Accessibility) {
-                                case "public":
-                                case "protected internal":
-                                case "protected":
-                                case "internal":
-                                    @namespace.Accessibility = type.Accessibility;
-                                    break;
-                            }
-                            break;
-                    }
-                }
             }
 
             UpdateNamespaceAccessibility(root);
@@ -214,85 +176,31 @@ namespace DocNuget.Models.Loader {
             return root;
         }
 
+        public static string MostLenientAccessibility(IEnumerable<string> accessibilities) {
+            accessibilities = accessibilities.Distinct();
+            return accessibilities.Contains("public")
+                    ? "public"
+                : accessibilities.Contains("protected internal")
+                    ? "protected internal"
+                : accessibilities.Contains("protected") && accessibilities.Contains("internal")
+                    ? "protected internal"
+                : accessibilities.Contains("protected")
+                    ? "protected"
+                : accessibilities.Contains("internal")
+                    ? "internal"
+                : "private";
+
+        }
+
         private static void UpdateNamespaceAccessibility(Namespace @namespace) {
             foreach (var sub in @namespace.Namespaces) {
                 UpdateNamespaceAccessibility(sub);
-                switch (@namespace.Accessibility) {
-                    case "protected internal":
-                        switch (sub.Accessibility) {
-                            case "public":
-                                @namespace.Accessibility = sub.Accessibility;
-                                break;
-                        }
-                        break;
-                    case "protected":
-                        switch (sub.Accessibility) {
-                            case "public":
-                            case "protected internal":
-                                @namespace.Accessibility = sub.Accessibility;
-                                break;
-                        }
-                        break;
-                    case "internal":
-                        switch (sub.Accessibility) {
-                            case "public":
-                            case "protected internal":
-                            case "protected":
-                                @namespace.Accessibility = sub.Accessibility;
-                                break;
-                        }
-                        break;
-                    case "private":
-                        switch (sub.Accessibility) {
-                            case "public":
-                            case "protected internal":
-                            case "protected":
-                            case "internal":
-                                @namespace.Accessibility = sub.Accessibility;
-                                break;
-                        }
-                        break;
-                }
             }
 
-            foreach (var type in @namespace.Types) {
-                switch (@namespace.Accessibility) {
-                    case "protected internal":
-                        switch (type.Accessibility) {
-                            case "public":
-                                @namespace.Accessibility = type.Accessibility;
-                                break;
-                        }
-                        break;
-                    case "protected":
-                        switch (type.Accessibility) {
-                            case "public":
-                            case "protected internal":
-                                @namespace.Accessibility = type.Accessibility;
-                                break;
-                        }
-                        break;
-                    case "internal":
-                        switch (type.Accessibility) {
-                            case "public":
-                            case "protected internal":
-                            case "protected":
-                                @namespace.Accessibility = type.Accessibility;
-                                break;
-                        }
-                        break;
-                    case "private":
-                        switch (type.Accessibility) {
-                            case "public":
-                            case "protected internal":
-                            case "protected":
-                            case "internal":
-                                @namespace.Accessibility = type.Accessibility;
-                                break;
-                        }
-                        break;
-                }
-            }
+            @namespace.Accessibility = MostLenientAccessibility(
+                new[] { @namespace.Accessibility }
+                    .Concat(@namespace.Namespaces.Select(sub => sub.Accessibility))
+                    .Concat(@namespace.Types.Select(type => type.Accessibility)));
         }
 
         public static Type ToType(this TypeDefinition type, AssemblyDefinition assembly) {
@@ -318,6 +226,9 @@ namespace DocNuget.Models.Loader {
                 Constructors = type.Methods
                     .Where(method => method.IsConstructor)
                     .Select(method => method.ToMethod(assembly))
+                    .ToList(),
+                Properties = type.Properties
+                    .Select(property => property.ToProperty(assembly))
                     .ToList(),
                 Accessibility =
                     type.IsPublic ? "public" :
@@ -376,6 +287,18 @@ namespace DocNuget.Models.Loader {
                     method.IsFamily ? "protected" :
                     "private",
             };
+        }
+
+        public static Property ToProperty(this PropertyDefinition property, AssemblyDefinition assembly) {
+            var prop = new Property {
+                Name = property.Name,
+                FullName = property.FullName,
+                Type = property.PropertyType.ToTypeRef(assembly),
+                Getter = property.GetMethod.ToMethod(assembly),
+                Setter = property.GetMethod.ToMethod(assembly),
+            };
+            prop.Accessibility = MostLenientAccessibility(new[] { prop.Getter.Accessibility, prop.Setter.Accessibility });
+            return prop;
         }
 
         public static Parameter ToParameter(this ParameterDefinition parameter, AssemblyDefinition assembly) {

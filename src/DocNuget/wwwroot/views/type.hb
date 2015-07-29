@@ -24,6 +24,10 @@
   {{> type.constructor Package=../Package Assembly=../Assembly Type=../Type Constructor=. }}
 {{/ ifEach }}
 
+{{# ifEach Type.Properties 'Properties' }}
+  {{> type.property Package=../Package Assembly=../Assembly Type=../Type Property=. }}
+{{/ ifEach }}
+
 {{# ifEach Type.Methods 'Methods' }}
   {{> type.method Package=../Package Assembly=../Assembly Type=../Type Method=. }}
 {{/ ifEach }}
