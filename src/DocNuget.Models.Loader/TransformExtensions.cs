@@ -13,6 +13,9 @@ using ILogger = Microsoft.Framework.Logging.ILogger;
 
 namespace DocNuget.Models.Loader {
     internal static class TransformExtensions {
+        private static Regex typeRefNameRegex = new Regex(@"^(?<fullname>(?:(?<namespace>[^<]+)\.)?(?<name>[^<.]+))(?:<(?<generics>(?:(?<open><)|(?<close-open>>)|[^<>]+)+)>)?$");
+        private static Regex genericsRegex = new Regex(@"[^<>,]+(?:<(?:(?<open><)|(?<close-open>>)|[^<>]+)+>)?(?:, ?|$)");
+
         public static Package ToPackage(this ZipPackage zipPackage, List<string> otherVersions, ILogger logger) {
             return new Package {
                 Id = zipPackage.Id,
@@ -336,14 +339,12 @@ namespace DocNuget.Models.Loader {
         }
 
         public static TypeRef ToTypeRef(this string name) {
-            var match = Regex.Match(name, @"^(?<fullname>(?:(?<namespace>[^<]+)\.)?(?<name>[^<.]+))(?:<(?<generics>(?:(?<open><)|(?<close-open>>)|[^<>]+)+)>)?$");
+            var match = typeRefNameRegex.Match(name);
             if (match.Success) {
                 return new TypeRef {
                     Name = match.Groups["name"].Value,
                     FullName = match.Groups["fullname"].Value,
-                    GenericParameters = Regex.Matches(
-                        match.Groups["generics"].Value,
-                        @"[^<>,]+(?:<(?:(?<open><)|(?<close-open>>)|[^<>]+)+>)?(?:, ?|$)")
+                    GenericParameters = genericsRegex.Matches(match.Groups["generics"].Value)
                         .OfType<Match>()
                         .Select(m => m.Value.TrimEnd(',', ' ').ToTypeRef()).Where(r => r != null).ToList(),
                 };
