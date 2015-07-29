@@ -1,6 +1,9 @@
-# DocNuget [![license-badge][]][license]
+# [DocNuget][] [![license-badge][]][license]
 [![travis-badge][]][travis] [![appveyor-badge][]][appveyor] [![quay-badge][]][quay] [![digital-ocean-badge][]][digital-ocean] [![tutum-badge][]][tutum]
 
+An online combination of VS object browser and MSDN.
+
+[DocNuget]: https://docnuget.nemo157.com/
 [tutum-badge]: https://img.shields.io/badge/deployed-tutum-0096e5.svg?style=flat-square
 [tutum]: https://www.tutum.co
 [digital-ocean-badge]: https://img.shields.io/badge/hosted-DigitalOcean-288feb.svg?style=flat-square
