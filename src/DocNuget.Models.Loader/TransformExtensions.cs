@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Microsoft.Framework.Logging;
 
@@ -180,6 +181,7 @@ namespace DocNuget.Models.Loader {
                 Interfaces = interfaces,
                 AllBaseTypes = allBaseTypes,
                 InAssembly = type.Module.Assembly == assembly,
+                GenericArguments = type.GenericParameters.Select(param => param.ToTypeRef(assembly)).ToList(),
                 Methods = type.Methods
                     .Where(method => !(method.IsConstructor || method.IsSetter || method.IsGetter))
                     .Select(method => method.ToMethod(assembly))
@@ -192,11 +194,30 @@ namespace DocNuget.Models.Loader {
         }
 
         public static TypeRef ToTypeRef(this TypeReference type, AssemblyDefinition assembly) {
-            return new TypeRef {
-                Name = CommonName(type.FullName) ?? type.Name,
+            var typeRef = type.FullName.ToTypeRef() ?? new TypeRef {
                 FullName = type.FullName,
-                InAssembly = type.TryResolve()?.Module?.Assembly == assembly,
+                GenericArguments = type.GenericParameters.Select(param => param.ToTypeRef(assembly)).ToList(),
             };
+            typeRef.Name = CommonName(type.FullName) ?? type.Name;
+            typeRef.InAssembly = type.TryResolve()?.Module?.Assembly == assembly;
+            return typeRef;
+        }
+
+        public static TypeRef ToTypeRef(this string name) {
+            var match = Regex.Match(name, @"^(?<fullname>(?:(?<namespace>[^<]+)\.)?(?<name>[^<.]+))(?:<(?<generics>(?:(?<open><)|(?<close-open>>)|[^<>]+)+)>)?$");
+            if (match.Success) {
+                return new TypeRef {
+                    Name = match.Groups["name"].Value,
+                    FullName = match.Groups["fullname"].Value,
+                    GenericArguments = Regex.Matches(
+                        match.Groups["generics"].Value,
+                        @"[^<>,]+(?:<(?:(?<open><)|(?<close-open>>)|[^<>]+)+>)?(?:, ?|$)")
+                        .OfType<Match>()
+                        .Select(m => m.Value.TrimEnd(',', ' ').ToTypeRef()).Where(r => r != null).ToList(),
+                };
+            } else {
+                return null;
+            }
         }
 
         public static TypeDefinition TryResolve(this TypeReference type) {

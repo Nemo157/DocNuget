@@ -1,1 +1,8 @@
-{{ Type.Name }}{{# if Type.GenericArguments }}&lt;{{# each Type.GenericArguments as |GenericArgument| }}{{> linkedName Package=../Package Assembly=../Assembly Type=GenericArgument }}{{/ each }}&gt;{{/ if }}
+{{~ replace Type.Name '`\d+$' '' ~}}
+{{~# if Type.GenericArguments ~}}
+  &lt;
+  {{~# join Type.GenericArguments ', ' ~}}
+    {{~> type.link Package=../Package Assembly=../Assembly Type=. ~}}
+  {{~/ join ~}}
+  &gt;
+{{~/ if ~}}
