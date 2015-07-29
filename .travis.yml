@@ -8,8 +8,8 @@ env:
 
 cache:
   directories:
-    - $HOME/.dnx/runtimes
-    - $HOME/.dnx/packages
+    - $HOME/.dnx
+    - $HOME/.npm
 
 script:
   - ./build.sh verify
