@@ -1,0 +1,9 @@
+<button class="btn btn-link btn-xs" data-toggle="collapse" data-target="#collapse-ns-{{ replace Namespace.FullName '\.' '-' }}">
+  <span class="glyphicon glyphicon-triangle-right"></span>
+</button>
+<b>
+  <a href="/packages/{{ Package.Id }}/{{ Package.Version }}/assemblies/{{ Assembly.Name }}/namespaces/{{ Namespace.FullName }}">{{ Namespace.Name }}</a>
+</b>
+<ul id="collapse-ns-{{ replace Namespace.FullName '\.' '-' }}" class="collapse in" style="list-style: none">
+  {{> namespace.tree Package=Package Assembly=Assembly Namespace=Namespace }}
+</ul>

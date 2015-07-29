@@ -63,11 +63,15 @@ var app = Sammy('#content', app => {
   app.use(fade)
   app.setLocationProxy(new PushLocationProxy(app, 'a', 'body'))
 
-  var defaultPartials : { [key: string]: string } = {
+  var partials : { [key: string]: string } = {
     'type.name': '/views/type/name.hb',
     'type.link': '/views/type/link.hb',
+    'type.method': '/views/type/method.hb',
+    'type.constructor': '/views/type/constructor.hb',
     'assembly.link': '/views/assembly/link.hb',
     'namespace.link': '/views/namespace/link.hb',
+    'namespace.tree': '/views/namespace/tree.hb',
+    'namespace.tree-node': '/views/namespace/tree-node.hb',
     'package.link': '/views/package/link.hb',
   }
 
@@ -75,12 +79,9 @@ var app = Sammy('#content', app => {
     .partial('/views/' + partial + '.hb')
     .then(next)
 
-  var apiRoute = (partial: string, partials: { [key: string]: string } = {}, getData: (route: Sammy.EventContext, pkg: any) => any = (route, pkg) => ({ Package: pkg })) => {
-    var map: { [key: string]: string } = {}
-    Object.keys(defaultPartials).forEach(key => map[key] = defaultPartials[key])
-    Object.keys(partials).forEach(key => map[key] = '/views/' + partials[key] + '.hb')
+  var apiRoute = (partial: string, getData: (route: Sammy.EventContext, pkg: any) => any = (route, pkg) => ({ Package: pkg })) => {
     return (route: Sammy.EventContext, next: () => void) => route
-      .loadPartials(map)
+      .loadPartials(partials)
       .load('/api/packages/' + route.params.package + (route.params.version ? '/' + route.params.version : ''))
       .then(JSON.parse)
       .then(pkg => getData(route, pkg))
@@ -95,8 +96,14 @@ var app = Sammy('#content', app => {
   var allTypes = (namespace: any) => namespace.Types.map((type: any) => ({ namespace, type }))
     .concat(...namespace.Namespaces.map(allTypes))
 
+  var allNamespaces = (namespace: any) => namespace.Namespaces
+    .concat(...namespace.Namespaces.map(allNamespaces))
+
   var findType = (assembly: any, name: string) => allTypes(assembly.RootNamespace)
     .find((pair: any) => pair.type.FullName === name)
+
+  var findNamespace = (assembly: any, name: string) => allNamespaces(assembly.RootNamespace)
+    .find((namespace: any) => namespace.FullName === name)
 
   app.get('/', basicRoute('index'))
   app.get('/about', basicRoute('about'))
@@ -104,15 +111,39 @@ var app = Sammy('#content', app => {
   app.get('/packages/:package/:version', apiRoute('package'))
 
   app.get('/packages/:package/:version/assemblies/:assembly',
-    apiRoute('assembly', { namespace: 'assembly/namespace' },
+    apiRoute('assembly',
       (route, pkg) => ({ Package: pkg, Assembly: findAssembly(pkg, route.params.assembly) })))
 
   app.get('/packages/:package/:version/assemblies/:assembly/:framework',
-    apiRoute('assembly', { namespace: 'assembly/namespace' },
+    apiRoute('assembly',
       (route, pkg) => ({ Package: pkg, Assembly: findAssembly(pkg, route.params.assembly, route.params.framework) })))
 
+  app.get('/packages/:package/:version/assemblies/:assembly/namespaces/:namespace',
+    apiRoute('namespace',
+      (route, pkg) => {
+        var assembly = findAssembly(pkg, route.params.assembly)
+        var namespace = findNamespace(assembly, route.params.namespace)
+        return {
+          Package: pkg,
+          Assembly: assembly,
+          Namespace: namespace,
+        }
+      }))
+
+  app.get('/packages/:package/:version/assemblies/:assembly/:framework/namespaces/:namespace',
+    apiRoute('namespace',
+      (route, pkg) => {
+        var assembly = findAssembly(pkg, route.params.assembly, route.params.framework)
+        var namespace = findNamespace(assembly, route.params.namespace)
+        return {
+          Package: pkg,
+          Assembly: assembly,
+          Namespace: namespace,
+        }
+      }))
+
   app.get('/packages/:package/:version/assemblies/:assembly/types/:type',
-    apiRoute('type', { 'type.method': 'type/method', 'type.constructor': 'type/constructor' },
+    apiRoute('type',
       (route, pkg) => {
         var assembly = findAssembly(pkg, route.params.assembly)
         var { namespace, type } = findType(assembly, route.params.type)
@@ -125,7 +156,7 @@ var app = Sammy('#content', app => {
       }))
 
   app.get('/packages/:package/:version/assemblies/:assembly/:framework/types/:type',
-    apiRoute('type', {},
+    apiRoute('type',
       (route, pkg) => {
         var assembly = findAssembly(pkg, route.params.assembly, route.params.framework)
         var { namespace, type } = findType(assembly, route.params.type)
@@ -163,7 +194,14 @@ interface BootswatchThemes {
 }
 
 $(() => {
-  $.get('http://api.bootswatch.com/3/', (data: BootswatchThemes) => {
+  $.get('//bootswatch.aws.af.cm/3/', (data: BootswatchThemes) => {
+    var original = $('#bootstrap').attr('href')
+    var originalLi = $('#theme-selector ul li')
+    $('#theme-selector ul li a').click(() => {
+      $('#theme-selector ul li').removeClass('active')
+      originalLi.addClass('active')
+      $('#bootstrap').attr('href', original)
+    })
     $('#theme-selector ul')
       .append(
         data.themes.map((value, index) => {

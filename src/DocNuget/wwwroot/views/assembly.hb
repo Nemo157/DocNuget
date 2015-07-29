@@ -1,7 +1,8 @@
 <div class="page-header">
-  <h4>package {{> package.link Package=Package }}</h4>
+  <h4><small>package</small> {{> package.link Package=Package }}</h4>
   <h3 style="margin-top: 0">
-    assembly {{ Assembly.Name }}
+    <small>assembly</small>
+    {{ Assembly.Name }}
     {{# if Assembly.Framework }}
       <small><code>{{ Assembly.Framework }}</code></small>
     {{/ if }}
@@ -10,7 +11,7 @@
 
 <h4>Classes</h4>
 <ul style="list-style: none">
-  <li>{{> namespace Package=Package Assembly=Assembly Namespace=Assembly.RootNamespace }}</li>
+  <li>{{> namespace.tree Package=Package Assembly=Assembly Namespace=Assembly.RootNamespace }}</li>
 </ul>
 
 {{# if Frameworks }}

@@ -1,5 +1,5 @@
 <div class="page-header">
-  <h3>{{ Package.Title }} <small><code>{{ Package.Version }}</code></small></h3>
+  <h3><small>package</small> {{ Package.Title }} <small><code>{{ Package.Version }}</code></small></h3>
 </div>
 
 <p>{{ Package.Summary }}</p>
