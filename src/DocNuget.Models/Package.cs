@@ -54,7 +54,7 @@ namespace DocNuget.Models {
 
         public List<TypeRef> Interfaces { get; set; }
 
-        public List<TypeRef> GenericArguments { get; set; }
+        public List<TypeRef> GenericParameters { get; set; }
 
         public bool InAssembly { get; set; }
 
@@ -68,7 +68,7 @@ namespace DocNuget.Models {
 
         public string FullName { get; set; }
 
-        public List<TypeRef> GenericArguments { get; set; }
+        public List<TypeRef> GenericParameters { get; set; }
 
         public bool InAssembly { get; set; }
     }

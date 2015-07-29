@@ -5,9 +5,9 @@
 {{~ else ~}}
   {{~ replace Type.Name '`\d+$' '' ~}}
 {{~/ if ~}}
-{{~# if Type.GenericArguments ~}}
+{{~# if Type.GenericParameters ~}}
   &lt;
-  {{~# join Type.GenericArguments ', ' ~}}
+  {{~# join Type.GenericParameters ', ' ~}}
     {{~> type.link Package=../Package Assembly=../Assembly Type=. ~}}
   {{~/ join ~}}
   &gt;

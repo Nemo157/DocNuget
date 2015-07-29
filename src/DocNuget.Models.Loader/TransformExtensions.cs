@@ -181,7 +181,7 @@ namespace DocNuget.Models.Loader {
                 Interfaces = interfaces,
                 AllBaseTypes = allBaseTypes,
                 InAssembly = type.Module.Assembly == assembly,
-                GenericArguments = type.GenericParameters.Select(param => param.ToTypeRef(assembly)).ToList(),
+                GenericParameters = type.GenericParameters.Select(param => param.ToTypeRef(assembly)).ToList(),
                 Methods = type.Methods
                     .Where(method => !(method.IsConstructor || method.IsSetter || method.IsGetter))
                     .Select(method => method.ToMethod(assembly))
@@ -196,7 +196,7 @@ namespace DocNuget.Models.Loader {
         public static TypeRef ToTypeRef(this TypeReference type, AssemblyDefinition assembly) {
             var typeRef = type.FullName.ToTypeRef() ?? new TypeRef {
                 FullName = type.FullName,
-                GenericArguments = type.GenericParameters.Select(param => param.ToTypeRef(assembly)).ToList(),
+                GenericParameters = type.GenericParameters.Select(param => param.ToTypeRef(assembly)).ToList(),
             };
             typeRef.Name = CommonName(type.FullName) ?? type.Name;
             typeRef.InAssembly = type.TryResolve()?.Module?.Assembly == assembly;
@@ -209,7 +209,7 @@ namespace DocNuget.Models.Loader {
                 return new TypeRef {
                     Name = match.Groups["name"].Value,
                     FullName = match.Groups["fullname"].Value,
-                    GenericArguments = Regex.Matches(
+                    GenericParameters = Regex.Matches(
                         match.Groups["generics"].Value,
                         @"[^<>,]+(?:<(?:(?<open><)|(?<close-open>>)|[^<>]+)+>)?(?:, ?|$)")
                         .OfType<Match>()
