@@ -67,7 +67,7 @@ var app = Sammy('#content', app => {
       (route, pkg) => ({ Package: pkg, Assembly: findAssembly(pkg, route.params.assembly, route.params.framework) })))
 
   app.get('/packages/:package/:version/assemblies/:assembly/types/:type',
-    apiRoute('type', {},
+    apiRoute('type', { 'type.method': 'type/method', 'type.constructor': 'type/constructor' },
       (route, pkg) => {
         var assembly = findAssembly(pkg, route.params.assembly)
         var { namespace, type } = findType(assembly, route.params.type)

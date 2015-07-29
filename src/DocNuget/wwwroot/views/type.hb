@@ -9,38 +9,16 @@
   <dt>Assembly</dt><dd>{{> assembly.link Package=Package Assembly=Assembly }}</dd>
 </dl>
 
+{{# if Type.Constructors }}
+  <h2>Constructors</h2>
+  {{# each Type.Constructors as |Constructor| }}
+    {{> type.constructor Package=../Package Assembly=../Assembly Type=../Type Constructor=Constructor }}
+  {{/ each }}
+{{/ if }}
+
 {{# if Type.Methods }}
   <h2>Methods</h2>
   {{# each Type.Methods as |Method| }}
-    <div>
-      <code>
-        {{ Visibility }}
-        {{# if Method.IsStatic }}static {{/ if }}
-        {{> type.link Package=../Package Assembly=../Assembly Type=Method.ReturnType }}
-        {{ Method.Name }}
-        {{~# if Method.GenericParameters ~}}
-          &lt;
-            {{~# join Method.GenericParameters ', ' ~}}
-              {{~ Name ~}}
-            {{~/ join ~}}
-          &gt;
-        {{~/ if ~}}
-        (
-          {{~# join Method.Parameters ', ' ~}}
-            {{~> type.link Package=../../Package Assembly=../../Assembly Type=Type }}
-            {{ Name ~}}
-          {{~/ join ~}}
-        )
-        {{~# each Method.GenericParameters as |GenericParameter| ~}}
-          {{~# if GenericParameter.Constraints ~}}
-            where {{ GenericParameter.Name }} :
-            {{~# join GenericParameter.Constraints ', ' ~}}
-              {{~> type.link Package=../../Package Assembly=../../Assembly Type=. ~}}
-            {{~/ join ~}}
-          {{~/ if ~}}
-        {{~/ each ~}}
-      </code>
-      <p>{{ Method.Summary }}</p>
-    </div>
+    {{> type.method Package=../Package Assembly=../Assembly Type=../Type Method=Method }}
   {{/ each }}
 {{/ if }}
