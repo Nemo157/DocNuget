@@ -6,6 +6,11 @@ env:
     - Configuration=Release
     - DNX_FEED=https://www.nuget.org/api/v2
 
+cache:
+  directories:
+    - $HOME/.dnx/runtimes
+    - $HOME/.dnx/packages
+
 script:
   - ./build.sh verify
 
