@@ -1,30 +1,30 @@
 <div class="page-header">
-  <h1>{{> type.name }}{{# if AllBaseTypes }} <small>: {{# join AllBaseTypes ', ' }}{{> type.link }}{{/ join }}</small>{{/ if }}</h1>
+  <h1>{{> type.name Package=Package Assembly=Assembly Type=Type }}{{# if Type.AllBaseTypes }} <small>: {{# join Type.AllBaseTypes ', ' }}{{> type.link Package=../Package Assembly=../Assembly Type=. }}{{/ join }}</small>{{/ if }}</h1>
 </div>
 
-<p>{{ Summary }}</p>
+<p>{{ Type.Summary }}</p>
 
 <dl class="dl-horizontal">
-  <dt>Namespace</dt><dd>{{> namespace.link Namespace }}</dd>
-  <dt>Assembly</dt><dd>{{> assembly.link Assembly }}</dd>
+  <dt>Namespace</dt><dd>{{> namespace.link Package=Package Assembly=Assembly Namespace=Namespace }}</dd>
+  <dt>Assembly</dt><dd>{{> assembly.link Package=Package Assembly=Assembly }}</dd>
 </dl>
 
-{{# if Methods }}
+{{# if Type.Methods }}
   <h2>Methods</h2>
-  {{# each Methods as |Method| }}
+  {{# each Type.Methods as |Method| }}
     <div>
       <code>
         {{ Visibility }}
-        {{# if IsStatic }}static {{/ if }}
-        {{> type.link Method.ReturnType }}
-        {{ Method.Name }}{{# if GenericParameters }}&lt;{{# join GenericParameters ', ' }}{{ Name }}{{/ join }}&gt;{{/ if }}({{# join Parameters ', ' }}{{> type.link Type }} {{ Name }}{{/ join }})
-        {{# each GenericParameters }}
-          {{# if Constraints }}
-            where {{ Name }} : {{# join Constraints ', ' }}{{> type.link }}{{/ join }}
+        {{# if Method.IsStatic }}static {{/ if }}
+        {{> type.link Package=../Package Assembly=../Assembly Type=Method.ReturnType }}
+        {{ Method.Name }}{{# if Method.GenericParameters }}&lt;{{# join Method.GenericParameters ', ' }}{{ Name }}{{/ join }}&gt;{{/ if }}({{# join Method.Parameters ', ' }}{{> type.link Package=../../Package Assembly=../../Assembly Type=Type }} {{ Name }}{{/ join }})
+        {{# each Method.GenericParameters as |GenericParameter| }}
+          {{# if GenericParameter.Constraints }}
+            where {{ GenericParameter.Name }} : {{# join GenericParameter.Constraints ', ' }}{{> type.link Package=../../Package Assembly=../../Assembly Type=. }}{{/ join }}
           {{/ if }}
         {{/ each }}
       </code>
-      <p>{{ Summary }}</p>
+      <p>{{ Method.Summary }}</p>
     </div>
   {{/ each }}
 {{/ if }}

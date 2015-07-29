@@ -261,51 +261,6 @@ namespace DocNuget.Models.Loader {
             return Walk(@namespace.Namespaces.FirstOrDefault(ns => ns.Name == path.First()), path.Skip(1));
         }
 
-        public static Package Link(this Package package) {
-            foreach (var assembly in package.Assemblies) {
-                assembly.Package = package;
-                Link(assembly, assembly.RootNamespace);
-            }
-
-            return package;
-        }
-
-        private static void Link(Assembly assembly, Namespace @namespace) {
-            @namespace.Assembly = assembly;
-            foreach (var childNamespace in @namespace.Namespaces) {
-                Link(assembly, childNamespace);
-            }
-
-            foreach (var type in @namespace.Types) {
-                type.Namespace = @namespace;
-                type.Assembly = assembly;
-
-                Link(assembly, type.BaseType);
-                Link(assembly, type.Interfaces);
-                Link(assembly, type.GenericArguments);
-                Link(assembly, type.Methods.SelectMany(method => new[] { method.ReturnType }.Concat(method.Parameters.Select(parameter => parameter.Type))));
-            }
-        }
-
-        private static void Link(Assembly assembly, TypeRef type) {
-            if (type == null) {
-                return;
-            }
-            if (type.InAssembly) {
-                type.Assembly = assembly;
-            }
-            Link(assembly, type.GenericArguments);
-        }
-
-        private static void Link(Assembly assembly, IEnumerable<TypeRef> types) {
-            if (types == null) {
-                return;
-            }
-            foreach (var type in types) {
-                Link(assembly, type);
-            }
-        }
-
         private static string CommonName(string name) {
             switch (name) {
                 case "System.Void": return "void";

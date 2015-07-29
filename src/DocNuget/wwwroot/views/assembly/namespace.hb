@@ -1,14 +1,14 @@
-<button class="btn btn-link btn-xs" data-toggle="collapse" data-target="#collapse-ns-{{ replace FullName '.' '-' }}">
+<button class="btn btn-link btn-xs" data-toggle="collapse" data-target="#collapse-ns-{{ replace Namespace.FullName '\.' '-' }}">
   <span class="glyphicon glyphicon-triangle-right"></span>
 </button>
 <b>
-  <a href="/packages/{{ Assembly.Package.Id }}/{{ Assembly.Package.Version }}/assemblies/{{ Assembly.Name }}/{{ Assembly.Framework }}/namespaces/{{ FullName }}">{{ Name }}</a>
+  <a href="/packages/{{ Package.Id }}/{{ Package.Version }}/assemblies/{{ Assembly.Name }}/{{ Assembly.Framework }}/namespaces/{{ Namespace.FullName }}">{{ Namespace.Name }}</a>
 </b>
-<ul id="collapse-ns-{{ replace FullName '.' '-' }}" class="collapse in" style="list-style: none">
-  {{# each Namespaces as |Namespace| }}
-    <li>{{> namespace Namespace }}</li>
+<ul id="collapse-ns-{{ replace Namespace.FullName '\.' '-' }}" class="collapse in" style="list-style: none">
+  {{# each Namespace.Namespaces as |Namespace| }}
+    <li>{{> namespace Package=../Package Assembly=../Assembly Namespace=Namespace }}</li>
   {{/ each }}
-  {{# each Types as |Type| }}
-    <li><a href="/packages/{{ ../Assembly.Package.Id }}/{{ ../Assembly.Package.Version }}/assemblies/{{ ../Assembly.Name }}/types/{{ Type.FullName }}">{{ Type.Name }}</a></li>
+  {{# each Namespace.Types as |Type| }}
+    <li><a href="/packages/{{ ../Package.Id }}/{{ ../Package.Version }}/assemblies/{{ ../Assembly.Name }}/types/{{ Type.FullName }}">{{ Type.Name }}</a></li>
   {{/ each }}
 </ul>

@@ -18,8 +18,6 @@ namespace DocNuget.Models {
     }
 
     public class Assembly {
-        public Package Package { get; set; }
-
         public string Name { get; set; }
 
         public string Path { get; set; }
@@ -34,8 +32,6 @@ namespace DocNuget.Models {
     }
 
     public class Namespace {
-        public Assembly Assembly { get; set; }
-
         public string Name { get; set; }
 
         public string FullName { get; set; }
@@ -62,10 +58,6 @@ namespace DocNuget.Models {
 
         public bool InAssembly { get; set; }
 
-        public Assembly Assembly { get; set; }
-
-        public Namespace Namespace { get; set; }
-
         public List<Method> Methods { get; set; }
 
         public List<Method> Constructors { get; set; }
@@ -79,8 +71,6 @@ namespace DocNuget.Models {
         public List<TypeRef> GenericArguments { get; set; }
 
         public bool InAssembly { get; set; }
-
-        public Assembly Assembly { get; set; }
     }
 
     public class Method {

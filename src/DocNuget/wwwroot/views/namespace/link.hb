@@ -1,1 +1,1 @@
-<a href="/packages/{{ Assembly.Package.Id }}/{{ Assembly.Package.Version }}/assemblies/{{ Assembly.Name }}/namespaces/{{ FullName }}">{{ FullName }}</a>
+<a href="/packages/{{ Package.Id }}/{{ Package.Version }}/assemblies/{{ Assembly.Name }}/namespaces/{{ Namespace.FullName }}">{{ Namespace.FullName }}</a>

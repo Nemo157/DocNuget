@@ -1,1 +1,1 @@
-<a href="/packages/{{ Id }}">{{ Id }}</a>
+<a href="/packages/{{ Package.Id }}">{{ Package.Id }}</a>

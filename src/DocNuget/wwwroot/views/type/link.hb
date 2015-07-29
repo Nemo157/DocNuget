@@ -1,6 +1,6 @@
-{{# if Assembly }}
-<a href="/packages/{{ Assembly.Package.Id }}/{{ Assembly.Package.Version }}/assemblies/{{ Assembly.Name }}/types/{{ FullName }}">{{ Name }}</a>
+{{# if Type.InAssembly }}
+<a href="/packages/{{ Package.Id }}/{{ Package.Version }}/assemblies/{{ Assembly.Name }}/types/{{ Type.FullName }}">{{ Type.Name }}</a>
 {{ else }}
-{{ Name }}
+{{ Type.Name }}
 {{/ if }}
-{{# if GenericArguments }}&lt;{{# each GenericArguments }}{{> type.link }}{{/ each }}&gt;{{/ if }}
+{{# if Type.GenericArguments }}&lt;{{# each Type.GenericArguments as |GenericArgument| }}{{> type.link Package=../Package Assembly=../Assembly Type=GenericArgument }}{{/ each }}&gt;{{/ if }}

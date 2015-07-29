@@ -1,1 +1,1 @@
-{{ Name }}{{# if GenericArguments }}&lt;{{# each GenericArguments }}{{> linkedName }}{{/ each }}&gt;{{/ if }}
+{{ Type.Name }}{{# if Type.GenericArguments }}&lt;{{# each Type.GenericArguments as |GenericArgument| }}{{> linkedName Package=../Package Assembly=../Assembly Type=GenericArgument }}{{/ each }}&gt;{{/ if }}

@@ -5,7 +5,6 @@ import PushLocationProxy from './sammy/push_location_proxy'
 import Handlebars = require('handlebars')
 import SammyHandlebars = require('sammy.handlebars')
 import fade from './sammy/fade'
-import resolve from './resolve'
 
 var a = $
 var b = bootstrap
@@ -31,7 +30,7 @@ var app = Sammy('#content', app => {
     .partial('/views/' + partial + '.hb')
     .then(next)
 
-  var apiRoute = (partial: string, partials: { [key: string]: string } = {}, getData: (route: Sammy.EventContext, pkg: any) => any = (route, pkg) => pkg) => {
+  var apiRoute = (partial: string, partials: { [key: string]: string } = {}, getData: (route: Sammy.EventContext, pkg: any) => any = (route, pkg) => ({ Package: pkg })) => {
     var map: { [key: string]: string } = {}
     Object.keys(defaultPartials).forEach(key => map[key] = defaultPartials[key])
     Object.keys(partials).forEach(key => map[key] = '/views/' + partials[key] + '.hb')
@@ -39,7 +38,6 @@ var app = Sammy('#content', app => {
       .loadPartials(map)
       .load('/api/packages/' + route.params.package + (route.params.version ? '/' + route.params.version : ''))
       .then(JSON.parse)
-      .then(resolve)
       .then(pkg => getData(route, pkg))
       .partial('/views/' + partial + '.hb')
       .then(next)
@@ -49,10 +47,11 @@ var app = Sammy('#content', app => {
     .Assemblies
     .find((assembly: any) => assembly.Name === name && (!framework || (assembly.TargetFramework && assembly.TargetFramework.FullName === framework)))
 
-  var allTypes = (namespace: any) => namespace.Types.concat(...namespace.Namespaces.map(allTypes))
+  var allTypes = (namespace: any) => namespace.Types.map((type: any) => ({ namespace, type }))
+    .concat(...namespace.Namespaces.map(allTypes))
 
   var findType = (assembly: any, name: string) => allTypes(assembly.RootNamespace)
-    .find((type: any) => type.FullName === name)
+    .find((pair: any) => pair.type.FullName === name)
 
   app.get('/', basicRoute('index'))
   app.get('/about', basicRoute('about'))
@@ -61,19 +60,37 @@ var app = Sammy('#content', app => {
 
   app.get('/packages/:package/:version/assemblies/:assembly',
     apiRoute('assembly', { namespace: 'assembly/namespace' },
-      (route, pkg) => findAssembly(pkg, route.params.assembly)))
+      (route, pkg) => ({ Package: pkg, Assembly: findAssembly(pkg, route.params.assembly) })))
 
   app.get('/packages/:package/:version/assemblies/:assembly/:framework',
     apiRoute('assembly', { namespace: 'assembly/namespace' },
-      (route, pkg) => findAssembly(pkg, route.params.assembly, route.params.framework)))
+      (route, pkg) => ({ Package: pkg, Assembly: findAssembly(pkg, route.params.assembly, route.params.framework) })))
 
   app.get('/packages/:package/:version/assemblies/:assembly/types/:type',
     apiRoute('type', {},
-      (route, pkg) => findType(findAssembly(pkg, route.params.assembly), route.params.type)))
+      (route, pkg) => {
+        var assembly = findAssembly(pkg, route.params.assembly)
+        var { namespace, type } = findType(assembly, route.params.type)
+        return {
+          Package: pkg,
+          Assembly: assembly,
+          Type: type,
+          Namespace: namespace,
+        }
+      }))
 
   app.get('/packages/:package/:version/assemblies/:assembly/:framework/types/:type',
     apiRoute('type', {},
-      (route, pkg) => findType(findAssembly(pkg, route.params.assembly, route.params.framework), route.params.type)))
+      (route, pkg) => {
+        var assembly = findAssembly(pkg, route.params.assembly, route.params.framework)
+        var { namespace, type } = findType(assembly, route.params.type)
+        return {
+          Package: pkg,
+          Assembly: assembly,
+          Type: type,
+          Namespace: namespace,
+        }
+      }))
 
   app.get('/404', (route, next) => route.partial('/views/404.hb', route.params).then(next))
 

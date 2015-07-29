@@ -47,7 +47,7 @@ namespace DocNuget.Models.Loader {
 
             var zipPackage = new ZipPackage(await feed.OpenNupkgStreamAsync(result));
 
-            return zipPackage.ToPackage(packages.Select(p => p.Version.ToString()).ToList(), logger).Link();
+            return zipPackage.ToPackage(packages.Select(p => p.Version.ToString()).ToList(), logger);
         }
     }
 }
