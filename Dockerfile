@@ -5,6 +5,9 @@ COPY . /source
 
 RUN \
   apt-get update && \
+  apt-get install -y curl && \
+  curl --silent --location https://deb.nodesource.com/setup_0.12 | bash - && \
+  apt-get update && \
   apt-get install -y nodejs && \
   cd /source && \
   Configuration=Release ./build.sh dnu-publish && \
