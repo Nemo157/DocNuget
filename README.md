@@ -1,4 +1,5 @@
-# DocNuget [![travis-badge][]][travis] [![quay-badge][]][quay] [![license-badge][]][license] [![digital-ocean-badge][]][digital-ocean] [![tutum-badge][]][tutum]
+# DocNuget [![license-badge][]][license]
+[![travis-badge][]][travis] [![quay-badge][]][quay] [![digital-ocean-badge][]][digital-ocean] [![tutum-badge][]][tutum]
 
 [tutum-badge]: https://img.shields.io/badge/deployed-tutum-0096e5.svg?style=flat-square
 [tutum]: https://www.tutum.co
