@@ -35,4 +35,4 @@ if ! type dnx > /dev/null 2>&1; then
     dnvm upgrade
 fi
 
-mono packages/Sake/tools/Sake.exe -I packages/KoreBuild/build -f makefile.shade "$@"
+mono packages/Sake/tools/Sake.exe -I build -I packages/KoreBuild/build -f makefile.shade "$@"
