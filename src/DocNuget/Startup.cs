@@ -21,10 +21,11 @@ namespace DocNuget {
                     ServeUnknownFileTypes = true,
                 })
                 .UseMvc()
-                .UseSendFileFallback()
-                .Use(async (context, next) => {
-                    await context.Response.SendFileAsync("wwwroot/index.html");
-                });
+                .Use((context, next) => {
+                    context.Request.Path = new PathString("/index.html");
+                    return next();
+                })
+                .UseStaticFiles();
         }
     }
 }
