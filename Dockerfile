@@ -6,7 +6,7 @@ COPY . /source
 RUN apt-get update && apt-get install -y curl
 RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
 RUN apt-get update && apt-get install -y nodejs
-RUN cd /source && DNX_FEED=https://www.nuget.org/api/v2 Configuration=Release ./build.sh dnu-publish
+RUN cd /source && Configuration=Release ./build.sh dnu-publish
 RUN mv /source/artifacts/site /site && rm /source
 
 EXPOSE 80

@@ -13,7 +13,7 @@ default Configuration='${E("Configuration")}'
 var webProject = 'DocNuget'
 
 #dnu-publish .package target='publish'
-  dnu-publish projectFile='src/${webProject}/project.json' dnuPublishOutputDir='${Path.Combine(Directory.GetCurrentDirectory(), "artifacts", webProject)}' configuration='${Configuration}' source='${Configuration == "Debug" ? true : false}' runtime='active'
+  dnu-publish projectFile='src/${webProject}/project.json' dnuPublishOutputDir='${Path.Combine(Directory.GetCurrentDirectory(), "artifacts", webProject)}' configuration='${Configuration}' source='${Configuration == "Debug" ? true : false}'
 
 use-standard-lifecycle
 webpack-goals

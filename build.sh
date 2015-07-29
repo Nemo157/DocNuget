@@ -31,6 +31,8 @@ if ! type dnvm > /dev/null 2>&1; then
     source packages/KoreBuild/build/dnvm.sh
 fi
 
-dnvm install 1.0.0-beta5
+if ! type dnx > /dev/null 2>&1; then
+    dnvm upgrade
+fi
 
 mono packages/Sake/tools/Sake.exe -I packages/KoreBuild/build -f makefile.shade "$@"
