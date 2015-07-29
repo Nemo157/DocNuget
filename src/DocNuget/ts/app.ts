@@ -36,10 +36,10 @@ var settings = {
 
 Handlebars.registerHelper('replace', (str: string, substr: string, newSubStr: string) => str && str.replace(new RegExp(substr, 'g'), newSubStr))
 Handlebars.registerHelper('join', (context: any[], sep: string, options: any) => (context || []).map(item => options.fn(item).trim()).join(sep))
-Handlebars.registerHelper('ifAccessible', function (item: string, options: any) {
+Handlebars.registerHelper('ifAccessible', function (item: { Accessibility: string }, options: any) {
   if ((settings.accessibility & Accessibility[item.Accessibility]) === Accessibility.none) {
     if (settings.accessibilityDebug) {
-      return '<div class="alert alert-warning"><b>Hidden by accessibility</b>:' + options.fn(this) + '</div>'
+      return options.fn(this)
     } else {
       return options.inverse(this)
     }
@@ -47,6 +47,15 @@ Handlebars.registerHelper('ifAccessible', function (item: string, options: any) 
     return options.fn(this)
   }
 })
+Handlebars.registerHelper('accessibilityDebug', function (item: { Accessibility: string }) {
+  if (settings.accessibilityDebug) {
+    if ((settings.accessibility & Accessibility[item.Accessibility]) === Accessibility.none) {
+      return new Handlebars.SafeString('<i class="fa fa-exclamation-triangle text-warning" title="Would be hidden by accessibility option"></i>')
+    }
+  }
+})
+
+Handlebars.registerHelper('ifEach', (items: any[], title: string, options: any) => items ? '<h4>' + title + '</h4>' + items.map(options.fn).join('\n') : options.inverse(this))
 
 var app = Sammy('#content', app => {
   app.debug = true

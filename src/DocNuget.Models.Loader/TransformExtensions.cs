@@ -180,6 +180,7 @@ namespace DocNuget.Models.Loader {
             return new Type {
                 Name = CommonName(type.FullName) ?? type.Name,
                 FullName = type.FullName,
+                Construct = type.IsClass ? "class" : type.IsEnum ? "enum" : type.IsValueType ? "struct" : type.IsInterface ? "interface" : "<unknown construct>",
                 BaseType = baseType,
                 Interfaces = interfaces,
                 AllBaseTypes = allBaseTypes,

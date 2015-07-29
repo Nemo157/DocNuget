@@ -1,11 +1,11 @@
 <div class="page-header">
-  <h1>{{ Package.Title }} <small><code>{{ Package.Version }}</code></small></h1>
+  <h3>{{ Package.Title }} <small><code>{{ Package.Version }}</code></small></h3>
 </div>
 
 <p>{{ Package.Summary }}</p>
 
 {{# if Package.Assemblies }}
-  <h2>Assemblies</h2>
+  <h4>Assemblies</h4>
   <ul>
     {{# each Package.Assemblies as |Assembly| }}
       <li>
@@ -19,7 +19,7 @@
 {{/ if }}
 
 {{# if Package.DependencySets }}
-  <h2>Dependencies</h2>
+  <h4>Dependencies</h4>
   <ul>
   {{# each Package.DependencySets as |DependencySet| }}
     <li>
@@ -34,7 +34,7 @@
   </ul>
 {{/ if }}
 
-<h2>Versions</h2>
+<h4>Other Versions</h4>
 <ul>
   {{# each Package.Versions as |Version| }}
     <li><a href="/packages/{{ ../Package.Id }}/{{ Version }}">{{ Version }}</a></li>

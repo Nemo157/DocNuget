@@ -70,4 +70,7 @@ declare module 'emblem' {
 
 declare module 'handlebars' {
   export function registerHelper(name: string, helper: Function): void
+  export class SafeString {
+    constructor(value: string)
+  }
 }

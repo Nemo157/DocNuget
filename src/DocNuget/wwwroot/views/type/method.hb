@@ -1,6 +1,7 @@
 {{# ifAccessible Method }}
   <div>
-    <code>
+    <h5>
+      {{ accessibilityDebug Method }}
       {{ Method.Accessibility }}
       {{# if Method.IsStatic }}static {{/ if }}
       {{> type.link Package=Package Assembly=Assembly Type=Method.ReturnType }}
@@ -26,7 +27,8 @@
           {{~/ join ~}}
         {{~/ if ~}}
       {{~/ each ~}}
-    </code>
+    </h5>
+
     <p>{{ Method.Summary }}</p>
   </div>
 {{/ ifAccessible }}

@@ -10,7 +10,12 @@
   {{/ each }}
   {{# each Namespace.Types as |Type| }}
     {{# ifAccessible Type }}
-      <li><a href="/packages/{{ ../../Package.Id }}/{{ ../../Package.Version }}/assemblies/{{ ../../Assembly.Name }}/types/{{ Type.FullName }}">{{ Type.Name }}</a></li>
+      <li>
+        {{ accessibilityDebug Type }}
+        <a href="/packages/{{ ../../Package.Id }}/{{ ../../Package.Version }}/assemblies/{{ ../../Assembly.Name }}/types/{{ Type.FullName }}">
+          {{ Type.Name }}
+        </a>
+        </li>
     {{/ ifAccessible }}
   {{/ each }}
 </ul>

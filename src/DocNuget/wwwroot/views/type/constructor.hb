@@ -1,6 +1,7 @@
 {{# ifAccessible Constructor }}
   <div>
-    <code>
+    {{ accessibilityDebug Constructor }}
+    <h5>
       {{ Accessibility }}
       {{ replace Type.Name '`\d+$' '' ~}}
       (
@@ -9,7 +10,7 @@
           {{ Name ~}}
         {{~/ join ~}}
       )
-    </code>
+    </h5>
     <p>{{ Constructor.Summary }}</p>
   </div>
 {{/ ifAccessible }}

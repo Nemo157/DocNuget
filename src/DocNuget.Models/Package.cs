@@ -46,6 +46,8 @@ namespace DocNuget.Models {
 
         public string FullName { get; set; }
 
+        public string Construct { get; set; }
+
         public string Summary { get; set; }
 
         public TypeRef BaseType { get; set; }
