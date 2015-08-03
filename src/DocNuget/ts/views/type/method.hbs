@@ -4,26 +4,26 @@
       {{ accessibilityDebug Method }}
       {{ Method.Accessibility }}
       {{# if Method.IsStatic }}static {{/ if }}
-      {{> type.link Package=Package Assembly=Assembly Type=Method.ReturnType }}
+      {{> link Package=Package Assembly=Assembly Type=Method.ReturnType }}
       {{ Method.Name }}
       {{~# if Method.GenericParameters ~}}
         &lt;
           {{~# join Method.GenericParameters ', ' ~}}
-            {{~ Name ~}}
+            {{~ this.Name ~}}
           {{~/ join ~}}
         &gt;
       {{~/ if ~}}
       (
         {{~# join Method.Parameters ', ' ~}}
-          {{~> type.link Package=../Package Assembly=../Assembly Type=Type }}
-          {{ Name ~}}
+          {{~> link Package=../Package Assembly=../Assembly Type=Type }}
+          {{ this.Name ~}}
         {{~/ join ~}}
       )
       {{~# each Method.GenericParameters as |GenericParameter| ~}}
         {{~# if GenericParameter.Constraints ~}}
           where {{ GenericParameter.Name }} :
           {{~# join GenericParameter.Constraints ', ' ~}}
-            {{~> type.link Package=../Package Assembly=../Assembly Type=. ~}}
+            {{~> link Package=../Package Assembly=../Assembly Type=. ~}}
           {{~/ join ~}}
         {{~/ if ~}}
       {{~/ each ~}}

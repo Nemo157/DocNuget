@@ -22,6 +22,12 @@
     },
     "bootstrap/bootstrap.d.ts": {
       "commit": "f6c8ca47193fb67947944a3170912672ac3e908e"
+    },
+    "when/when.d.ts": {
+      "commit": "c1366499a861fcb0e6cb46c8fd649eb8676b1b7e"
+    },
+    "rest/rest.d.ts": {
+      "commit": "fe6ee4074a75758a59d756d61b035da57049d355"
     }
   }
 }

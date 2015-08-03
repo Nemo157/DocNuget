@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
     "noImplicitAny": true,
-    "module": "commonjs",
-    "sourceMap": true
+    "target": "es6"
   },
   "files": [
     "tsd.d.ts",

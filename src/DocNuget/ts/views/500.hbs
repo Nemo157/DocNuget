@@ -1,0 +1,12 @@
+<div class="alert alert-danger">
+  Whoops loading <code><a class="alert-link" href={{ this.path }}>{{ this.path }}</a></code>
+  appears to have caused an error. Guess you should go
+  <a class="alert-link" href="javascript:history.back()">back</a>
+  and hope it gets fixed.
+</div>
+
+{{# if error }}
+  <div class="alert alert-warning">
+    <b>Error details:</b> {{ error }}
+  </div>
+{{/ if }}

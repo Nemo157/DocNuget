@@ -4,11 +4,8 @@ module.exports = {
     filename: '../wwwroot/bundle.js'
   },
   resolve: {
-    extensions: ['', '.ts', '.webpack.js', '.web.js', '.js', '.em'],
+    extensions: ['', '.ts', '.webpack.js', '.web.js', '.js', '.hbs'],
     alias: {
-      'sammy': 'knottie-sammy',
-      'sammy.push_location_proxy': 'knottie-sammy/lib/plugins/sammy.push_location_proxy',
-      'sammy.handlebars': 'knottie-sammy/lib/plugins/sammy.handlebars',
       'handlebars': 'handlebars/dist/handlebars'
     }
   },
@@ -19,7 +16,8 @@ module.exports = {
   devtool: 'source-map',
   module: {
     loaders: [
-      { test: /\.ts$/, loader: 'ts-loader' }
+      { test: /\.ts$/, loader: 'babel-loader!ts-loader' },
+      { test: /\.hbs$/, loader: 'handlebars-loader?helperDirs[]=' + __dirname + '/views/helpers' }
     ]
   }
 }

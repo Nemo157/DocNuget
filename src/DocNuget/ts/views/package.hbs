@@ -9,7 +9,7 @@
   <ul>
     {{# each Package.Assemblies as |Assembly| }}
       <li>
-        <samp>{{> assembly.link Package=../Package Assembly=Assembly }}</samp>
+        <samp>{{> assembly/link Package=../Package Assembly=Assembly }}</samp>
         {{# each Assembly.TargetFrameworks as |TargetFramework| }}
           <small><code><a href="/packages/{{ ../../Package.Id }}/{{ ../../Package.Version }}/assemblies/{{ ../Assembly.Name }}/{{ TargetFramework }}">{{ TargetFramework }}</a></code></small>
         {{/ each }}
@@ -26,7 +26,7 @@
       <b>{{ DependencySet.TargetFramework.FullName }}</b>
       <ul>
         {{# each DependencySet.Dependencies as |Dependency| }}
-          <li>{{> package.link Package=Dependency }} <small><code>{{ Dependency.VersionSpec }}</code></small></li>
+          <li>{{> package/link Package=Dependency }} <small><code>{{ Dependency.VersionSpec }}</code></small></li>
         {{/ each }}
       </ul>
     </li>

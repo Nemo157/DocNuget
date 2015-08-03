@@ -6,8 +6,8 @@
       {{ replace Type.Name '`\d+$' '' ~}}
       (
         {{~# join Constructor.Parameters ', ' ~}}
-          {{~> type.link Package=../Package Assembly=../Assembly Type=Type }}
-          {{ Name ~}}
+          {{~> link Package=../Package Assembly=../Assembly Type=Type }}
+          {{ this.Name ~}}
         {{~/ join ~}}
       )
     </h5>

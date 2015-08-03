@@ -5,5 +5,5 @@
   <a href="/packages/{{ Package.Id }}/{{ Package.Version }}/assemblies/{{ Assembly.Name }}/namespaces/{{ Namespace.FullName }}">{{ Namespace.Name }}</a>
 </b>
 <ul id="collapse-ns-{{ replace Namespace.FullName '\.' '-' }}" class="collapse in" style="list-style: none">
-  {{> namespace.tree Package=Package Assembly=Assembly Namespace=Namespace }}
+  {{> tree Package=Package Assembly=Assembly Namespace=Namespace }}
 </ul>
