@@ -1,23 +1,16 @@
 import * as rahdan from './node_modules/rahdan/src/rahdan'
-import rest from 'rest'
-import mime from 'rest/interceptor/mime'
-import errorCode from 'rest/interceptor/errorCode'
-import pathPrefix from 'rest/interceptor/pathPrefix'
+import * as when from 'when'
 import fade from './rahdan/fade'
+import * as cache from './cache'
 
 var content = $('#content')
 
 var basicRoute = (view: string) => (route: rahdan.EventContext) => content.html(view)
 
-var apiClient = rest.wrap(mime).wrap(errorCode).wrap(pathPrefix, { prefix: '/api' })
-
 var apiRoute = (view: (data: any) => string, getData: (route: rahdan.EventContext, pkg: any) => any = (route, pkg) => ({ Package: pkg })) => {
   return (route: rahdan.EventContext) =>
-    apiClient('packages/' + route.params['package'] + (route.params['version'] ? '/' + route.params['version'] : ''))
-      .entity()
-      .then((pkg: any) => getData(route, pkg))
-      .then((data: any) => view(data))
-      .then(view => content.html(view))
+    cache.get(route.params['package'], route.params['version'])
+      .then((pkg: any) => content.html(view(getData(route, pkg))))
 }
 
 var findAssembly = (pkg: any, name: string, framework?: string) => pkg
@@ -47,9 +40,12 @@ var findNamespace = (assembly: any, name: string) => allNamespaces(assembly.Root
 //   }
 
 var app = rahdan.builder()
-  .error((route: rahdan.EventContext, error: any) => console.log('Error loading path', route.path, error))
-  .error((route: rahdan.EventContext, error: any) => content.html(require<(data: any) => string>('./views/500.hbs')({ path: route.path, error: error })))
+  .usePromises(<any>when)
   .use(fade, { element: content })
+  .around((context, next) => next().catch(err => {
+    console.log('Error loading path', context.path, err)
+    content.html(require<(data: any) => string>('./views/500.hbs')({ path: context.path, error: err }))
+  }))
   .get('/', basicRoute(require<() => string>('./views/index.hbs')()))
   .get('/about', basicRoute(require<() => string>('./views/about.hbs')()))
   .get('/404', (route: rahdan.EventContext) => content.html(require<(data: any) => string>('./views/404.hbs')(route.params)))
