@@ -1,7 +1,7 @@
 FROM microsoft/aspnet
 MAINTAINER Wim Looman <wim@nemo157.com>
 
-RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash - && apt-get install -y nodejs
+RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash - && apt-get install -y nodejs git
 
 EXPOSE 80
 WORKDIR /site
