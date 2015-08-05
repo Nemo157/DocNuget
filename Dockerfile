@@ -9,7 +9,7 @@ ENTRYPOINT ["/bin/bash", "kestrel", "--server.urls", "http://localhost:80"]
 
 COPY . /source
 
-RUN && \
+RUN \
   cd /source && \
   Configuration=Release ./build.sh dnu-publish && \
   mv /source/artifacts/DocNuget /site && \
