@@ -1,8 +1,4 @@
-import rest from 'rest'
-import mime from 'rest/interceptor/mime'
-import errorCode from 'rest/interceptor/errorCode'
-import pathPrefix from 'rest/interceptor/pathPrefix'
-import * as when from 'when'
+import fetch from 'fetch'
 
 var cache: {
   [pkg: string]: {
@@ -10,9 +6,15 @@ var cache: {
   }
 } = {}
 
-var apiClient = rest.wrap(mime).wrap(errorCode).wrap(pathPrefix, { prefix: '/api' })
-
-export var get = (pkg: string, version: string) =>
-  cache[pkg] && cache[pkg][version]
-    ? when.resolve(cache[pkg][version])
-    : apiClient('packages/' + pkg + (version ? '/' + version : '')).entity()
+export var get = (pkg: string, version: string) => {
+  if (!cache[pkg]) {
+    cache[pkg] = {}
+  }
+  if (cache[pkg][version]) {
+    return Promise.resolve(cache[pkg][version])
+  } else {
+    return fetch('/api/packages/' + pkg + (version ? '/' + version : ''))
+      .then(res => res.json())
+      .then(json => cache[pkg][version] = json)
+  }
+}

@@ -6,7 +6,8 @@ module.exports = {
   resolve: {
     extensions: ['', '.ts', '.webpack.js', '.web.js', '.js', '.hbs'],
     alias: {
-      'handlebars': 'handlebars/dist/handlebars'
+      'handlebars': 'handlebars/dist/handlebars',
+      'fetch': './fetch'
     }
   },
   externals: {

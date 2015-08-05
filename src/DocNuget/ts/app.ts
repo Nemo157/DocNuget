@@ -1,5 +1,4 @@
 import * as rahdan from './node_modules/rahdan/src/rahdan'
-import * as when from 'when'
 import fade from './rahdan/fade'
 import * as cache from './cache'
 
@@ -40,7 +39,6 @@ var findNamespace = (assembly: any, name: string) => allNamespaces(assembly.Root
 //   }
 
 var app = rahdan.builder()
-  .usePromises(<any>when)
   .use(fade, { element: content })
   .around((context, next) => next().catch(err => {
     console.log('Error loading path', context.path, err)

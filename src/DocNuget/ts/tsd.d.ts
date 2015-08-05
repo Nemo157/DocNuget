@@ -5,6 +5,16 @@ declare module 'handlebars' {
   }
 }
 
+declare module 'fetch' {
+  export interface Response {
+    json(): Promise<any>
+  }
+
+  export function fetch(url: string): Promise<Response>
+
+  export default fetch
+}
+
 declare var require: {
   <T>(path: string): T;
   (paths: string[], callback: (...modules: any[]) => void): void;
