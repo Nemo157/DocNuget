@@ -12,5 +12,5 @@ COPY . /source
 RUN \
   cd /source && \
   Configuration=Release ./build.sh dnu-publish && \
-  mv /source/artifacts/DocNuget /site && \
+  mv /source/artifacts/DocNuget/* /site && \
   rm -rf /source
