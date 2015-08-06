@@ -1,12 +1,23 @@
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.StaticFiles;
+using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
+using MongoDB.Driver;
 
 namespace DocNuget {
     public class Startup {
         public void ConfigureServices(IServiceCollection services) {
+            var config = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .Build();
+
+            var connection = config.Get("DOCNUGET_DATABASE");
+            if (connection != null) {
+                services.AddInstance(new MongoClient(connection).GetDatabase("DocNuget"));
+            }
+
             services.AddMvc();
         }
 

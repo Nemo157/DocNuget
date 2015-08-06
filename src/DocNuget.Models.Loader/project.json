@@ -4,7 +4,8 @@
     "Microsoft.Framework.Logging": "1.0.0-beta6-*",
     "Microsoft.Framework.PackageManager": "1.0.0-beta6-*",
     "DocNuget.Models": "1.0.0-*",
-    "Mono.Cecil": "0.9.6.1"
+    "Mono.Cecil": "0.9.6.1",
+    "MongoDB.Driver": "2.0.1"
   },
   "frameworks": {
     "dnx451": {}

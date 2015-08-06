@@ -14,7 +14,8 @@
     "Microsoft.AspNet.StaticFiles": "1.0.0-beta6-*",
     "Microsoft.Framework.Logging.Console": "1.0.0-beta6-*",
     "DocNuget.Models": "1.0.0-*",
-    "DocNuget.Models.Loader": "1.0.0-*"
+    "DocNuget.Models.Loader": "1.0.0-*",
+    "MongoDB.Driver": "2.0.1"
   },
   "commands": {
     "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5001",
