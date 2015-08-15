@@ -43,7 +43,7 @@ namespace DocNuget.Models.Loader {
                 return null;
             }
 
-            logger.LogInformation("Found version {package.Version} of {package.Id}");
+            logger.LogInformation($"Found version {package.Version} of {package.Id}");
 
             var zipPackage = new ZipPackage(await feed.OpenNupkgStreamAsync(package));
 
