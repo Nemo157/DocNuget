@@ -250,18 +250,18 @@ namespace DocNuget.Models.Loader {
         }
 
         public static TypeRef ToTypeRef(this string name) {
-            var match = typeRefNameRegex.Match(name);
-            if (match.Success) {
-                return new TypeRef {
-                    Name = match.Groups["name"].Value,
-                    FullName = match.Groups["fullname"].Value,
-                    GenericParameters = genericsRegex.Matches(match.Groups["generics"].Value)
-                        .OfType<Match>()
-                        .Select(m => m.Value.TrimEnd(',', ' ').ToTypeRef()).Where(r => r != null).ToList(),
-                };
-            } else {
-                return null;
-            }
+            // var match = typeRefNameRegex.Match(name);
+            // if (match.Success) {
+            //     return new TypeRef {
+            //         Name = match.Groups["name"].Value,
+            //         FullName = match.Groups["fullname"].Value,
+            //         GenericParameters = genericsRegex.Matches(match.Groups["generics"].Value)
+            //             .OfType<Match>()
+            //             .Select(m => m.Value.TrimEnd(',', ' ').ToTypeRef()).Where(r => r != null).ToList(),
+            //     };
+            // } else {
+            return null;
+            // }
         }
 
         public static TypeDefinition TryResolve(this TypeReference type) {
