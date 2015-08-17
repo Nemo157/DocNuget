@@ -15,7 +15,7 @@ namespace DocNuget.Models.Loader {
         }
 
         public async Task<Package> LoadAsync(string id, string version) {
-            if (_db == null || version == null) {
+            if (_db == null) {
                 return null;
             }
 
@@ -23,12 +23,23 @@ namespace DocNuget.Models.Loader {
 
             var collection = _db.GetCollection<Package>("packages");
             logger.LogInformation($"Looking up {id} v{version} from db");
-            var package = await collection.Find(pkg => pkg.UniqueId == $"{id}/{version}").FirstOrDefaultAsync();
+
+            Package package;
+            if (version == null) {
+                package = await collection
+                    .Find(pkg => pkg.Id == id)
+                    .SortByDescending(pkg => pkg.Version)
+                    .FirstOrDefaultAsync();
+            } else {
+                package = await collection
+                    .Find(pkg => pkg.UniqueId == $"{id}/{version}")
+                    .FirstOrDefaultAsync();
+            }
 
             if (package == null) {
                 logger.LogInformation($"Didn't find {id} v{version} in db");
             } else {
-                logger.LogInformation($"Found {id} v{version} in db");
+                logger.LogInformation($"Found {package.Id} v{package.Version} in db");
             }
 
             return package;
@@ -43,7 +54,10 @@ namespace DocNuget.Models.Loader {
 
             logger.LogInformation($"Saving {package.Id} at {package.Version} to db");
             var collection = _db.GetCollection<Package>("packages");
-            await collection.InsertOneAsync(package);
+            await collection.ReplaceOneAsync(
+                p => p.UniqueId == package.UniqueId,
+                package,
+                new UpdateOptions { IsUpsert = true });
             logger.LogInformation($"Saved {package.Id} at {package.Version} to db");
         }
     }

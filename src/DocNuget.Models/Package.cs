@@ -19,6 +19,8 @@ namespace DocNuget.Models {
         public string UniqueId {
             get { return $"{Id}/{Version}"; }
         }
+
+        public int GeneratorVersion { get; set; }
     }
 
     public class Assembly {

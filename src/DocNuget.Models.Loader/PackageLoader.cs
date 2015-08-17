@@ -14,7 +14,7 @@ namespace DocNuget.Models.Loader {
 
         public async Task<Package> LoadAsync(string id, string version) {
             var result = await _dbLoader.LoadAsync(id, version);
-            if (result == null) {
+            if (result == null || result.GeneratorVersion < TransformExtensions.Version) {
                 result = await _nugetLoader.LoadAsync(id, version);
                 await _dbLoader.SaveAsync(result);
             }

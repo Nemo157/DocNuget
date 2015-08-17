@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Microsoft.Framework.Logging;
 
@@ -13,8 +12,7 @@ using ILogger = Microsoft.Framework.Logging.ILogger;
 
 namespace DocNuget.Models.Loader {
     internal static class TransformExtensions {
-        private static Regex typeRefNameRegex = new Regex(@"^(?<fullname>(?:(?<namespace>[^<]+)\.)?(?<name>[^<.]+))(?:<(?<generics>(?:(?<open><)|(?<close-open>>)|[^<>]+)+)>)?$");
-        private static Regex genericsRegex = new Regex(@"[^<>,]+(?:<(?:(?<open><)|(?<close-open>>)|[^<>]+)+>)?(?:, ?|$)");
+        public static int Version = 2;
 
         public static Package ToPackage(this ZipPackage zipPackage, List<string> otherVersions, ILogger logger) {
             return new Package {
@@ -31,7 +29,8 @@ namespace DocNuget.Models.Loader {
                     .Where(file => file.Path.EndsWith("dll", StringComparison.OrdinalIgnoreCase))
                     .GroupBy(file => Path.GetFileNameWithoutExtension(file.Path.Split('\\').Last()))
                     .Select(assembly => assembly.ToAssembly().TryLoadHelp(zipPackage, logger))
-                    .ToList()
+                    .ToList(),
+                GeneratorVersion = Version,
             };
         }
 
@@ -48,7 +47,6 @@ namespace DocNuget.Models.Loader {
                         continue;
                     }
 
-                    logger.LogDebug("Found xml help for member {0}", name);
                     try {
                         switch (name.First()) {
                             case 'T': {
@@ -240,7 +238,7 @@ namespace DocNuget.Models.Loader {
         }
 
         public static TypeRef ToTypeRef(this TypeReference type, AssemblyDefinition assembly) {
-            var typeRef = type.FullName.ToTypeRef() ?? new TypeRef {
+            var typeRef = type.FullName.ToTypeRef(assembly) ?? new TypeRef {
                 FullName = type.FullName,
                 GenericParameters = type.GenericParameters.Select(param => param.ToTypeRef(assembly)).ToList(),
             };
@@ -249,19 +247,31 @@ namespace DocNuget.Models.Loader {
             return typeRef;
         }
 
-        public static TypeRef ToTypeRef(this string name) {
-            // var match = typeRefNameRegex.Match(name);
-            // if (match.Success) {
-            //     return new TypeRef {
-            //         Name = match.Groups["name"].Value,
-            //         FullName = match.Groups["fullname"].Value,
-            //         GenericParameters = genericsRegex.Matches(match.Groups["generics"].Value)
-            //             .OfType<Match>()
-            //             .Select(m => m.Value.TrimEnd(',', ' ').ToTypeRef()).Where(r => r != null).ToList(),
-            //     };
-            // } else {
-            return null;
-            // }
+        public static TypeRef ToTypeRef(this string name, AssemblyDefinition assembly) {
+            var i = name.IndexOf('<');
+            var fullname = name;
+            var generics = new List<TypeRef>();
+            if (i != -1) {
+                fullname = name.Substring(0, i);
+                i += 1;
+                for (int count = 0, j = i + 1; count >= 0 && j < name.Length; j++) {
+                    if (name[j] == '<') {
+                        count++;
+                    } else if (name[j] == '>') {
+                        count--;
+                    }
+                    if ((name[j] == ',' && count == 0) || count == -1) {
+                        generics.Add(name.Substring(i, j - i).Trim().ToTypeRef(assembly));
+                        i = j + 1;
+                    }
+                }
+            }
+            return new TypeRef {
+                Name = fullname.Substring(fullname.LastIndexOf('.') + 1),
+                FullName = fullname,
+                GenericParameters = generics,
+                InAssembly = !string.IsNullOrWhiteSpace(fullname) && assembly.Modules.Any(module => module.GetType(fullname) != null),
+            };
         }
 
         public static TypeDefinition TryResolve(this TypeReference type) {
