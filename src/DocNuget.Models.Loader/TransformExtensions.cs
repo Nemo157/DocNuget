@@ -273,7 +273,7 @@ namespace DocNuget.Models.Loader {
         }
 
         public static Method ToMethod(this MethodDefinition method, AssemblyDefinition assembly) {
-            return new Method {
+            return method == null ? null : new Method {
                 Name = method.Name,
                 FullName = method.FullName,
                 ReturnType = method.ReturnType.ToTypeRef(assembly),
@@ -297,7 +297,7 @@ namespace DocNuget.Models.Loader {
                 Getter = property.GetMethod.ToMethod(assembly),
                 Setter = property.GetMethod.ToMethod(assembly),
             };
-            prop.Accessibility = MostLenientAccessibility(new[] { prop.Getter.Accessibility, prop.Setter.Accessibility });
+            prop.Accessibility = MostLenientAccessibility(new[] { prop.Getter?.Accessibility, prop.Setter?.Accessibility });
             return prop;
         }
 
