@@ -13,6 +13,12 @@ namespace DocNuget {
                 .AddEnvironmentVariables()
                 .Build();
 
+            MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<Models.Package>(map => {
+                map.AutoMap();
+                map.MapIdMember(p => p.UniqueId);
+                map.MapProperty(p => p.Id);
+            });
+
             var connection = config.Get("DOCNUGET_DATABASE");
             if (connection != null) {
                 services.AddInstance(new MongoClient(connection).GetDatabase("DocNuget"));

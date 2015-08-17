@@ -15,6 +15,10 @@ namespace DocNuget.Models {
         public List<Assembly> Assemblies { get; set; }
 
         public List<DependencySet> DependencySets { get; set; }
+
+        public string UniqueId {
+            get { return $"{Id}/{Version}"; }
+        }
     }
 
     public class Assembly {

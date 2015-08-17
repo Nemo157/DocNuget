@@ -23,7 +23,7 @@ namespace DocNuget.Models.Loader {
 
             var collection = _db.GetCollection<Package>("packages");
             logger.LogInformation($"Looking up {id} v{version} from db");
-            var package = await collection.Find(pkg => pkg.Id == id && pkg.Version == version).FirstOrDefaultAsync();
+            var package = await collection.Find(pkg => pkg.UniqueId == $"{id}/{version}").FirstOrDefaultAsync();
 
             if (package == null) {
                 logger.LogInformation($"Didn't find {id} v{version} in db");
