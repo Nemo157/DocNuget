@@ -17,9 +17,12 @@ namespace DocNuget.Models.Loader {
 
             var sourceProvider = new PackageSourceProvider(
                 NullSettings.Instance,
-                new[] { new PackageSource(NuGetConstants.DefaultFeedUrl) });
+                new[] {
+                    new PackageSource(NuGetConstants.DefaultFeedUrl),
+                    new PackageSource("https://www.myget.org/F/aspnetvnext/api/v2"),
+                });
 
-            var feed = sourceProvider
+            var feeds = sourceProvider
                 .LoadPackageSources()
                 .Select(source =>
                     PackageSourceUtils.CreatePackageFeed(
@@ -27,12 +30,13 @@ namespace DocNuget.Models.Loader {
                         noCache: false,
                         ignoreFailedSources: false,
                         reports: logger.CreateReports()))
-                .Where(f => f != null)
-                .First();
+                .Where(f => f != null);
 
             logger.LogInformation($"Looking up {id} v{version} from nuget");
 
-            var packages = (await feed.FindPackagesByIdAsync(id)).OrderByDescending(p => p.Version);
+            var packages = (await Task.WhenAll(feeds.Select(feed => feed.FindPackagesByIdAsync(id))))
+                .SelectMany(_ => _)
+                .OrderByDescending(p => p.Version);
 
             var package = version == null
                 ? packages.FirstOrDefault()
@@ -45,7 +49,20 @@ namespace DocNuget.Models.Loader {
 
             logger.LogInformation($"Found version {package.Version} of {package.Id}");
 
-            var zipPackage = new ZipPackage(await feed.OpenNupkgStreamAsync(package));
+            var pkgStreams = await Task.WhenAll(feeds.Select(feed => {
+                try {
+                    return feed.OpenNupkgStreamAsync(package);
+                } catch {
+                    return null;
+                }
+            }));
+            var pkgStream = pkgStreams.FirstOrDefault(s => s != null);
+            var zipPackage = new ZipPackage(pkgStream);
+
+            if (zipPackage == null) {
+                logger.LogError($"Unable to open package stream for {id} v{version}");
+                return null;
+            }
 
             return zipPackage.ToPackage(packages.Select(p => p.Version.ToString()).ToList(), logger);
         }
